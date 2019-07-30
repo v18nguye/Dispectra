@@ -16,7 +16,7 @@ rng(1)      % set the seed
 %%%%%%%%%%%%%%
 simu_opts = simu_prop( 'doa' , M );    % select the type of data to be simulated. possible choices are: 'doa' , 'gaussian' , 'dgaussian')
 
-[ theta_y , x_y , y, A_simu ] = simu_opts.simu(K,SNR);  % simulate the observation vector
+[ theta_y , x_y , y ] = simu_opts.simu(K,SNR);  % simulate the observation vector
 
 
 %%

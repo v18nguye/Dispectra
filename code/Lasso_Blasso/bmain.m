@@ -5,51 +5,51 @@ clc
 addpath(genpath('./simu'))
 addpath(genpath('./lasso'))
 addpath(genpath('./dictgen'))
+addpath(genpath('./blasso'))
 
-snr = inf; % signal noise ratio input.
-rng = 1; % set the seed.
-N = 5; % number of used spectrum units
-load('dict_infos.mat','dict','dez','xe','ye') % load the dictionary informations.
+N = 100;    % size of the dictionary A : M*N
+K = 3;      % number of sources in the simulated signal
+SNR = inf;  % input snr
+rng(1)      % set the seed
 
 %%
 %%%%%%%%%%%%%%
 % Simulation %
 %%%%%%%%%%%%%%
 
-[y, x_gt, pst, ampt] = simu_spec(N, dict, snr);
+simu_opts = bsimu('2dgaussian');    % select the type of data to be simulated. possible choices are: 'doa' , 'gaussian' , 'dgaussian')
+
+[ param , coef , y , A_simu] = simu_opts.simu(K,SNR);  % simulate the observation vector
+
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%
 % Methods parameters %
 %%%%%%%%%%%%%%%%%%%%%%
 
-opts.A = dict;
-lambda_lambdaMax = .01;
+opts.param_grid = simu_opts.test_grid(N);
+opts.A = simu_opts.atom(opts.param_grid);
 
+opts.atom = simu_opts.atom;
+opts.datom = simu_opts.datom;
+opts.B = simu_opts.p_range;
+opts.cplx = simu_opts.cplx;
+
+lambda_lambdaMax = .01;
 lambdaMax = norm(opts.A'*y,inf);
 
 opts.lambda = lambda_lambdaMax*lambdaMax;
-opts.maxIter = 10000;
+opts.maxIter = 100;
 opts.tol = 1.e-5;
 opts.disp = true;
 
 %%
-%%%%%%%%%
-% Fista %
-%%%%%%%%%
-dict_siz = size(dict);
-N = dict_siz(2); % number of the dictioinary elements 
-opts.L = max(eig(opts.A'*opts.A));
-opts.xinit = zeros(N,1);
+%%%%%%%%%%%%%%
+% SFW-blasso %
+%%%%%%%%%%%%%%
+opts.mergeStep = .01;
+[param_SFW_blasso, x_SFW_blasso , fc_SFW_blasso , fc_SFW_lasso , fc_SFW_lassodual ] = SFW( y , opts );
 
-[x_FISTA_lasso , fc_FISTA_lasso , fc_FISTA_lassodual] = fista( y , opts );
-
-% find the nonzero indices and their values
-[row_x,col_x,v_x] = find(x_FISTA_lasso);
-
-% the number of nonzero elements
-nonzero_eles = size(row_x);
-nonzero_eles = nonzero_eles(1);
 
 %%
 %%%%%%%%%%%%%%
@@ -57,66 +57,13 @@ nonzero_eles = nonzero_eles(1);
 %%%%%%%%%%%%%%
 
 figure
-pcolor(xe,ye,reshape(y,dez))
-title('simulated spectrum density')
-shading interp
-saveas(gcf, 'n5_simulated_spec.png');
-
-% component size of each element in the dictionary
-component_size = size(dict);
-component_size = component_size(2);
-
-ori_pst_sort = sort(pst);
-ori_nonzeros_eles = size(ori_pst_sort);
-ori_nonzeros_eles = ori_nonzeros_eles(2);
-
-row_plot_max = max(nonzero_eles,ori_nonzeros_eles);
+stem(param,coef)
+xlim(simu_opts.p_range)
+hold all
+plot(param_SFW_blasso,x_SFW_blasso,'xr')
 
 figure
-% draw the ground truth spectrum density components.
-for k = 1:1:ori_nonzeros_eles
-    
-    subplot(2,row_plot_max,k);
-    pcolor(xe,ye,reshape(dict(:,ori_pst_sort(1,k)),dez));
-    shading interp
-    % o_i - orginal indice.
-    % a - amplitude.
-    title(['o_i: ', num2str(ori_pst_sort(1,k)), ' - a: ', num2str(ampt(k,1))]);    
-end
-
-% draw the spectrum density components found by FISTA.
-for k =1:1:nonzero_eles
-    
-    % take each component indice and its value.
-    fista_compo = zeros(component_size,1);
-    fista_compo(row_x(k,1)) = v_x(k,1);
-    fista_y = dict*fista_compo;
-    
-    subplot(2,row_plot_max,row_plot_max+k);
-    pcolor(xe,ye,reshape(fista_y,dez));
-    shading interp
-    % f_i - fista indice of each component.
-    % a - amplitude.
-    title(['f_i: ', num2str(row_x(k,1)), ' - a: ', num2str(v_x(k,1))]);    
-    
-end
-saveas(gcf, 'n5_spec_units.png');
-
-
-figure
-semilogy(fc_FISTA_lasso)
+plot(fc_SFW_lasso)
 xlabel('iter.')
 ylabel('lasso cost-function')
-saveas(gcf, 'n5_cost_function.png');
-
-
-figure
-stem(pst,ampt,'LineStyle', 'none');
-hold all
-stem(row_x',v_x','LineStyle', 'none');
-xlabel('indice');
-ylabel('amplitude');
-legend('Ground Truth','FISTA');
-saveas(gcf, 'n5_indice_amplitude.png');
-
 

@@ -57,7 +57,7 @@ A = exp(-0.5*T.^2/sigma^2);
 A = A*diag(1./sqrt(sum(A.^2,1)));
 end
 
-function A = atom_dgaussian( param , m , sigma ) % define our own datom.
+function A = atom_dgaussian( param , m , sigma )
 t = linspace(0,1,m)';
 T = repmat(t,1,length(param))-repmat(param,m,1);
 A = (T./sigma^2).*exp(-0.5*T.^2/sigma^2);
