@@ -135,7 +135,7 @@ end
 
 
 function [param,coeff,y, A_simu] = signal(k,SNR,p_range,atom,cplx)
-param = (rand(1,k))*(p_range(2)-p_range(1))+p_range(1);
+param = (rand(1,k)+1i*randn(1,k))*(p_range(2)-p_range(1))+p_range(1);
 if(cplx)
     coeff = randn(k,1)+1i*randn(k,1);
 else
