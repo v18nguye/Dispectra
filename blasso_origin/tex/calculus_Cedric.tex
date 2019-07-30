@@ -1,0 +1,268 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage{amsmath}
+\usepackage{amsfonts,pifont}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage{hyperref}
+\usepackage{cleveref,}
+
+
+% % % Macros perso
+\renewcommand{\vec}[1]{\ensuremath{\bm{#1}}}
+\newcommand{\y}{\vec{y}}
+\newcommand{\dico}{\ensuremath{\mathcal{A}}}
+\newcommand{\atom}{\ensuremath{\vec{a}}}
+\newcommand{\x}{\vec{x}}
+\renewcommand{\r}{\vec{r}}
+\newcommand{\subdico}{\ensuremath{\tilde{\mathcal{D}}}}
+\newcommand{\region}{\ensuremath{\mathcal{R}}}
+\newcommand{\supp}{\ensuremath{\mathcal{S}}}
+\newcommand{\xopt}{\ensuremath{\vec{x}^\star}}
+\newcommand{\R}{\ensuremath{\mathbb{R}}}
+\newcommand{\C}{\ensuremath{\mathbb{C}}}
+\newcommand{\cone}{\ensuremath{\mathcal{K}}}
+\newcommand{\card}[1]{\ensuremath{\text{card}\left(#1\right)}}
+
+\newcommand{\abs}[1]{\ensuremath{\left|#1\right|}}
+\newcommand{\norm}[1]{\ensuremath{\left\Vert#1\right\Vert}}
+\newcommand{\normUn}[1]{\ensuremath{\left\Vert#1\right\Vert_1}}
+\newcommand{\normDeux}[1]{\ensuremath{\left\Vert#1\right\Vert_2}}
+\newcommand{\normZero}[1]{\ensuremath{\left\Vert#1\right\Vert_0}}
+\newcommand{\normInf}[1]{\ensuremath{\left\Vert#1\right\Vert_\infty}}
+\newcommand{\scalprod}[2]{\ensuremath{\langle#1,#2\rangle}}
+
+\newcommand{\projPM}[2]{\ensuremath{\Pi^\pm_{#1}(#2)}}
+\newcommand{\proj}[2]{\ensuremath{\Pi_{#1}(#2)}}
+\newcommand{\projOrth}[2]{\ensuremath{\Pi_{#1^\perp}(#2)}}
+
+\newcommand{\aml}[1]{\ensuremath{\arg\min\limits_{#1}}}
+\newcommand{\aMl}[1]{\ensuremath{\arg\max\limits_{#1}}}
+
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+\begin{document}
+	
+	\begin{equation*}
+		\norm{\projPM{\cone}{\r}} \triangleq \max\left(\norm{\proj{\cone}{\r}},\norm{\proj{\cone}{-\r}}\right)
+	\end{equation*}
+	
+	\begin{equation*}
+		\norm{\projPM{\cone}{\r}}^2+\norm{\projOrth{\dot{\cone}}{\r}}^2=\norm{\projPM{\cone}{\r}+\projOrth{\dot{\cone}}{\r}}^2
+	\end{equation*}
+	
+	\begin{equation*}
+	\norm{\projPM{\cone}{\r}}^2>\alpha^2\left(\norm{\projPM{\cone}{\r}}^2+\norm{\projOrth{\dot{\cone}}{\r}}^2\right)
+	\end{equation*}
+	
+	\begin{equation*}
+	(1-\alpha^2)\norm{\projPM{\cone}{\r}}^2>\alpha^2\norm{\projOrth{\dot{\cone}}{\r}}^2
+	\end{equation*}
+	
+	\begin{equation*}
+	\norm{\projPM{\cone}{\r}}^2>\frac{\alpha^2}{1-\alpha^2}\norm{\projOrth{\dot{\cone}}{\r}}^2
+	\end{equation*}
+	
+	\begin{equation*}
+	\norm{\projPM{\cone}{\r}}>\sqrt{\frac{1-\epsilon^2}{\epsilon^2}}\norm{\projOrth{\dot{\cone}}{\r}}
+	\end{equation*}
+	
+	\begin{equation*}
+	\epsilon\norm{\projPM{\cone}{\r}}>\sqrt{1-\epsilon^2}\norm{\projOrth{\dot{\cone}}{\r}}
+	\end{equation*}
+	
+	\section*{Calcul du gradient cas complexe}
+	
+	\begin{align*}
+		\norm{\x}^2=\x^H\x & = (\x_r-j\x_i)^T(\x_r+j\x_i) \\
+						   & = \x_r^T\x_r+\x_i^T\x_i-j\x_i^T\x_r+j\x_r^T\x_i\\
+						   & = \x_r^T\x_r+\x_i^T\x_i
+	\end{align*}
+	
+	\begin{align*}
+		\norm{\y-\dico\x}^2 & =\norm{\y_r-(\dico\x)_r}^2+\norm{\y_i-(\dico\x)_i}^2\\
+		(\dico\x)_r & = \dico_r\x_r-\dico_i\x_i\\
+		(\dico\x)_i & = \dico_r\x_i+\dico_i\x_r
+	\end{align*}
+	
+	\begin{align*}
+		\nabla_{\x_r}\norm{\y-\dico\x}^2 & = \nabla_{\x_r}\underbrace{\norm{\y_r-(\dico\x)_r}^2}_{=\norm{\y_r+\dico_i\x_i-\dico_r\x_r)}^2} +\nabla_{\x_r}\underbrace{\norm{\y_i-(\dico\x)_i}^2}_{=\norm{\y_i-\dico_r\x_i-\dico_i\x_r)}^2}\\
+		& = -2\dico^T_r(\y_r+\dico_i\x_i-\dico_r\x_r)-2\dico^T_i(\y_i-\dico_r\x_i-\dico_i\x_r)\\
+		& = -2\dico^T_r(\y_r-(\dico\x)_r)-2\dico^T_i(\y_i-(\dico\x)_i)\\
+		& = -2\Re\left\{\dico^H(\y-\dico\x)\right\}
+	\end{align*}
+	
+	\begin{align*}
+	\nabla_{\x_i}\norm{\y-\dico\x}^2 & = \nabla_{\x_i}\underbrace{\norm{\y_r-(\dico\x)_r}^2}_{=\norm{\y_r+\dico_i\x_i-\dico_r\x_r)}^2} +\nabla_{\x_i}\underbrace{\norm{\y_i-(\dico\x)_i}^2}_{=\norm{\y_i-\dico_r\x_i-\dico_i\x_r)}^2}\\
+	& = 2\dico^T_i(\y_r+\dico_i\x_i-\dico_r\x_r)-2\dico^T_r(\y_i-\dico_r\x_i-\dico_i\x_r)\\
+	& = 2\dico^T_i(\y_r-(\dico\x)_r)-2\dico^T_r(\y_i-(\dico\x)_i)\\
+	& = -2\Im\left\{\dico^H(\y-\dico\x)\right\}
+	\end{align*}
+	
+	Thus:
+	\begin{align}
+		\nabla_{\x_r}\norm{\y-\dico\x}^2 & = -2\Re\left\{\dico^H(\y-\dico\x)\right\}\label{diffXr}\\
+		\nabla_{\x_i}\norm{\y-\dico\x}^2 & = -2\Im\left\{\dico^H(\y-\dico\x)\right\}\label{diffXi}
+	\end{align}
+	
+	
+	\newpage
+	\section*{F.-W. blasso}
+	
+	\begin{align*}
+		J(\x,t) & = \frac{1}{2}\norm{\y-\dico\x}^2+\lambda t&&\\
+		& \text{s.t.} \underbrace{\normUn{\x}}_{=\sum \text{modules des }\x_i}\leq t\leq \frac{\norm{\y}^2}{2\lambda}\triangleq M \qquad\equiv \mathcal{C}&& 
+	\end{align*}
+	
+	\textbf{Differential $J(\x,t)$:}
+	
+	\begin{eqnarray*}
+		J(\x,t) & = & J(\x_0,t_0)
+		+\nabla_{\x_r}^TJ(\x_0,t_0)(\x_r-{\x_0}_r)
+		+\nabla_{\x_i}^TJ(\x_0,t_0)(\x_i-{\x_0}_i)
+		+\nabla_{t}^TJ(\x_0,t_0)(t-t_0)
+	\end{eqnarray*}
+	
+	\textbf{F.-W. step:} 
+	
+	Find $(\hat{\x}_r,\hat{\x}_i,\hat{t})\in\aml{(\x_r,\x_i,t)\in\mathcal{C}}\nabla_{\x_r}^TJ(\x_0,t_0)\x_r
+	+\nabla_{\x_i}^TJ(\x_0,t_0)\x_i+\nabla_{t}^TJ(\x_0,t_0)t$.
+	
+	From \cref{diffXr} and \cref{diffXi}, we have:
+	\begin{equation*}
+		\nabla_{\x_r}^TJ(\x_0,t_0)\x_r
+		+\nabla_{\x_i}^TJ(\x_0,t_0)\x_i = -\Re\left\{\x^H\dico^H(\y-\dico\x_0)\right\}
+	\end{equation*}
+	
+	From the Hôlder inequality:
+	\begin{equation*}
+		\Re\left\{\x^H\dico^H(\y-\dico\x_0)\right\}\leq\normUn{\x}\normInf{\dico^H(\y-\dico\x_0)}
+	\end{equation*}
+	
+	Thus:
+	\begin{align*}
+		-\Re\left\{\x^H\dico^H(\y-\dico\x_0)\right\}+\lambda t & \geq-\normUn{\x}\normInf{\dico^H(\y-\dico\x_0)}+\lambda t\\
+		& \geq-\normUn{\x}\left(\normInf{\dico^H(\y-\dico\x_0)}-\lambda\right),\quad\forall (x,t)\in\mathcal{C}\\
+		& = \normUn{\x}\left(\lambda-\normInf{\dico^H(\y-\dico\x_0)}\right)
+	\end{align*}
+	
+	We have:
+	\begin{align}
+		\min\limits_{0\leq\normUn{\x}\leq M} \normUn{\x}\left(\lambda-\normInf{\dico^H(\y-\dico\x_0)}\right) = \left\{
+		\begin{array}{ll}
+			0 & \text{if } \lambda\geq\normInf{\dico^H(\y-\dico\x_0)}\\
+			M\left(\lambda-\normInf{\dico^H(\y-\dico\x_0)}\right) & \text{otherwise}
+		\end{array}\label{eq_bound}
+		\right.
+	\end{align}
+	
+	Note that if we choose
+	\begin{equation}
+		\begin{array}{ll}
+			\hat{\x}(i) = \left\{\begin{array}{ll}
+				M.e^{-j\arg(\atom_i^H(\y-\dico\x_0))} & i=\aMl{j}\abs{\atom_j^H(\y-\dico\x_0)}\\
+				0 & \text{otherwise}
+			\end{array}\right.\\
+			\hat{t} = M
+		\end{array}\label{eq_min}
+	\end{equation}
+	we have $(\x,t)\in\mathcal{C}$ and $-\Re\left\{\x^H\dico^H(\y-\dico\x_0)\right\}+\lambda t=M\left(\lambda-\normInf{\dico^H(\y-\dico\x_0)}\right)$
+	
+	$\rightarrow$ attains the lower bounds \cref{eq_bound}. \Cref{eq_min} is thus a minimizer.
+	
+	\newpage
+	\begin{enumerate}
+		\item Current iterate: $(\x^{(k)},t^{(k)})$
+		\item Atom selection step: 
+		\begin{equation*}
+			\atom^{(k)}=\aMl{\tilde\atom\in\dico}\abs{\scalprod{\tilde{\atom}}{\y-\dico\x^{(k)}}}
+		\end{equation*}
+		\item Std F.-W. update:
+		\begin{align*}
+			\gamma^{(k)} & = \aml{\gamma\in[0,1]}\frac{1}{2}\norm{\underbrace{\y-(1-\gamma)\dico\x^{(k)}-\gamma\atom^{(k)}\hat{\x}}_{\r^{(k)}-\gamma(\atom{(k)}-\dico\x{(k)})}}^2+\lambda\left((1-\gamma)t^{(k)}+\gamma M\right)\\
+			& = \aml{\gamma\in[0,1]}\frac{1}{2}\left(\norm{\r^{(k)}}^2-2\gamma\Re\left\{\scalprod{\r^{(k)}}{\atom^{(k)}\hat{\x}-\dico\x{(k)}}\right\}+\gamma^2\norm{\atom^{(k)}\hat{\x}-\dico\x^{(k)}}^2\right)\\
+			&\qquad +\lambda\left(t^{(k)}-\gamma(t^{(k)}-M)\right)\\
+			& \triangleq \aml{\gamma\in[0,1]}f(\gamma)
+		\end{align*}
+			
+		\begin{align*}			
+				f'(\gamma)&=-\Re\left\{\scalprod{\r^{(k)}}{\atom^{(k)}\hat{\x}-\dico\x^{(k)}}-\lambda\left(t^{(k)}-M\right)\right\}+\gamma\norm{\atom^{(k)}\hat{\x}-\dico\x^{(k)}}^2
+		\end{align*}
+		\begin{align*}
+			\tilde{\gamma} & :  f'(\gamma)=0\\
+			& = \frac{\Re\left\{\scalprod{\r^{(k)}}{\atom^{(k)}\hat{\x}-\dico\x^{(k)}}+\lambda\left(t^{(k)}-M\right)\right\}}{\norm{\atom^{(k)}\hat{\x}-\dico\x^{(k)}}^2}
+		\end{align*}
+		\begin{align}
+			\gamma^{(k)}&=\left\{\begin{array}{ll}
+				0 & \text{si } \tilde{\gamma}<0\\
+				\tilde{\gamma} & \text{si } 0\leq\tilde{\gamma}\leq 1\\
+				1 & \text{si } \tilde{\gamma}>1\\				
+			\end{array}\right.\\
+			\nonumber\\
+			x^{(k+\frac{1}{2})}& = (1-\gamma^{(k)})\x^{(k)}+\gamma^{(k)}\hat{\x}\\
+			t^{(k+\frac{1}{2})}& = (1-\gamma^{(k)})t^{(k)}+\gamma^{(k)}M
+		\end{align}
+		
+		\item Let $\supp^{(k)}$ be the current support of $\x^{(k+\frac{1}{2})}$
+		\begin{equation}
+			\x^{(k+1)}=\aml{\x_{\supp^{(k)}}}\frac{1}{2}\norm{\y-\dico_{\supp^{(k)}}\x_{\supp^{(k)}}}^2+\lambda\normUn{\x_{\supp^{(k)}}}
+		\end{equation}
+		
+		\item Joint optimization:
+		\begin{align}
+			\min\limits_{\x,\theta,\beta}&\frac{1}{2}\norm{\y-\sum_{i=1}^{\card{\supp^{(k)}}}\atom(\theta_i)x_i}^2+\lambda\sum_{i=1}^{\card{\supp^{(k)}}}\beta_i\\
+			&\text{s.t.}\qquad \abs{x_i}\leq\beta_i\equiv\sqrt{\Re^2(x_i)+\Im^2(x_i)}\leq\beta_i\equiv\quad\text{contraintes convexe}
+		\end{align}
+		
+	\end{enumerate}
+	
+	\newpage	
+	\section*{Borne inf. pour le screening}
+	
+	On cherche $\tau$ tel que:
+	\begin{equation*}
+		\max\limits_{\atom\in\dico}\abs{\scalprod{\atom}{\r}}\geq\tau
+	\end{equation*}
+	Soit 
+	\begin{equation*}
+		\bar{\atom}=\frac{1}{N}\sum\limits_{i=1}^N \atom_i,\qquad \atom_i\in\bar{\dico}\subseteq\dico,
+	\end{equation*}
+	alors,
+	\begin{align*}
+		\abs{\scalprod{\bar{\atom}}{\r}} = & \frac{1}{N}\abs{\scalprod{\sum\limits_{i=1}^N \atom_i}{\y}}\\
+		=  & \frac{1}{N}\abs{\sum\limits_{i=1}^N\scalprod{ \atom_i}{\y}}\\
+		\leq & \frac{1}{N}\sum\limits_{i=1}^N\abs{\scalprod{\atom_i}{\y}}\\
+		\leq & \max\limits_{\atom\in\dico}\abs{\scalprod{\atom}{\r}}.
+	\end{align*}
+	Donc, $\tau=\abs{\scalprod{\bar{\atom}}{\r}}$ est une borne inf. pour $\max\limits_{\atom\in\dico}\abs{\scalprod{\atom}{\r}}$.
+	
+	
+	\section*{DoA avec polynôme trigonométrique} 
+	
+	\begin{align}
+		f(\theta)=\scalprod{\y}{\atom(\theta)} & = \sum\limits_{k=0}^M y_k e^{-itk}
+	\end{align}
+	
+	On cherche $\theta=\aMl{\theta}\abs{f(\theta)}$.
+	
+	On a
+	\begin{align}
+		f'(\theta) = \sum\limits_{k=0}^M \underbrace{-i\theta y_k}_{\alpha_k} \underbrace{(e^{-i\theta})^k}_{x^k}
+	\end{align}
+	
+	On défini le polynome:
+	\begin{equation*}
+		p(x) = \sum\limits_{k=0}^M \alpha_k x^k
+	\end{equation*}
+
+	Estimation de la DoA en 3 étapes:
+	\begin{enumerate}
+		\item Recherche de $\mathcal{X}=\left\{x\quad\text{t.q.}\quad p(x)=0\quad\text{et}\quad\norm{x}=1 \right\}$
+		\item Selection de l'atom: $x=\aMl{x\in\mathcal{X}} \abs{\sum\limits_{k=0}^M y_k x^k}$
+		\item Estimation de la DoA : $\theta = \arg(ix)$
+	\end{enumerate}
+\end{document}
