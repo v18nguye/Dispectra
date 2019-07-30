@@ -1,0 +1,31 @@
+
+
+~~~~~~~~~~~~~~~~~~~~~~~
+In DATAWELL directory :
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Wave spectra are in "yyyy-mm-ddTHHhMM.dat" files :
+ -> half-hourly ASCII files
+ -> can be read with matlab script "Read_datawell_dat.m" 
+ -> spectra are computed using DATAWELL software 
+
+Integrated wave parameters are in "yyyy-mm.his" files :
+ -> monthly ASCII files
+ -> can be read with matlab script "Read_datawell_his.m" 
+ -> wave parameters are computed using DATAWELL software 
+
+~~~~~~~~~~~~~~~~~~
+In WW3 directory :
+~~~~~~~~~~~~~~~~~~
+
+Wave spectra are "ww3.NODEXXXXXX_yyyymm_spec.nc" files :
+ -> monthly NetCDF files (WaveWatchIII point output)
+ -> can be read with matlab script "Read_NetCDF.m" 
+ -> spectra modeled by WW3
+
+Integrated wave parameters are "ww3.NODEXXXXXX_yyyymm_para.nc" files :
+ -> monthly NetCDF files (extracted from WaveWatchIII field output)
+ -> can be read with matlab script "Read_NetCDF.m" 
+ -> computed by WW3 model
+
+
