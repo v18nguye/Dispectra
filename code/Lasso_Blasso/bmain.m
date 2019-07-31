@@ -17,9 +17,9 @@ rng(1)      % set the seed
 % Simulation %
 %%%%%%%%%%%%%%
 
-simu_opts = bsimu('2dgaussian');    % select the type of data to be simulated. possible choices are: 'doa' , 'gaussian' , 'dgaussian')
+simu_opts = bsimuxy('2dgaussian');    % select the type of data to be simulated. possible choices are: 'doa' , 'gaussian' , 'dgaussian')
 
-[ param , coef , y , A_simu] = simu_opts.simu(K,SNR);  % simulate the observation vector
+[ paramr , coef , y , A_simu] = simu_opts.simu(K,SNR);  % simulate the observation vector
 
 
 %%
@@ -57,10 +57,13 @@ opts.mergeStep = .01;
 %%%%%%%%%%%%%%
 
 figure
-stem(param,coef)
-xlim(simu_opts.p_range)
+
+scatter3(paramr(1,:),paramr(2,:),coef)
+%scatter(paramr(1,:),paramr(2,:));
 hold all
-plot(param_SFW_blasso,x_SFW_blasso,'xr')
+scatter3(param_SFW_blasso(1,:),param_SFW_blasso(2,:),x_SFW_blasso)
+%scatter(param_SFW_blasso(1,:),param_SFW_blasso(2,:));
+%plot(param_SFW_blasso,x_SFW_blasso,'xr')
 
 figure
 plot(fc_SFW_lasso)

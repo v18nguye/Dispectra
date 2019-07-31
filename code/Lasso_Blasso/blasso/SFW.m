@@ -71,7 +71,7 @@ for iter = 1 : opts.maxIter
     if(opts.disp)
         disp('--------')
         disp(['Iteration :',int2str(iter)])
-        disp(['Selected parameter :',num2str(param_new)])
+        disp(['Selected parameter x: ',num2str(param_new(1,1)),' y: ',num2str(param_new(2,1))])
         disp(['Inner product value :',num2str(val_new)])
     end
     
@@ -128,7 +128,7 @@ for iter = 1 : opts.maxIter
     % Merge %
     % % % % %
     % merge many spikes that are closed 
-    [ param_est , x , t ] = merge( y , param_est , x , opts.lambda , M , opts.atom , opts.datom , opts.B , opts.mergeStep , opts.cplx );
+%    [ param_est , x , t ] = merge( y , param_est , x , opts.lambda , M , opts.atom , opts.datom , opts.B , opts.mergeStep , opts.cplx );
     
     A = opts.atom(param_est);
     Ax  = opts.atom(param_est)*x;
@@ -284,7 +284,7 @@ while true
         residual = A_temp*coeff_temp-y;
         
         % atom selection
-        fObj = @(param) min_scal_prod(residual,param,atom,datom);
+        fObj = @(param) min_scal_prod2(residual,param,atom,datom);
         C = [ -1 ; 1 ];
         b = [ -B(1); B(2) ];
         options = optimoptions(@fmincon,'Display','off','GradObj','on','Algorithm','sqp');
