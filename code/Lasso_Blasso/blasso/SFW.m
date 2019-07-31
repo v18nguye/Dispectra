@@ -63,6 +63,7 @@ for iter = 1 : opts.maxIter
     % % % % % % % % % % % % %
     % Atom selection step % %
     % % % % % % % % % % % % %
+    % add a supplement theta
     [ out_atom_selection ] = atom_selection( residual , opts );
     param_new = out_atom_selection.param_new;
     val_new = out_atom_selection.val;
@@ -89,6 +90,7 @@ for iter = 1 : opts.maxIter
     % % % % % % % % % % %
     % Std F.-W. update % %
     % % % % % % % % % % %
+    % modify alphas
     if(opts.lambda>=abs(val_new))
         [ x , ~ , stopflag] = std_FW_update_v1( residual , A , x , t , M , opts.lambda );
         if(stopflag)
@@ -108,6 +110,7 @@ for iter = 1 : opts.maxIter
     % % % % % % % % % %
     % Fista  update % %
     % % % % % % % % % %
+    %update alphas
     opts_fista.L = max(eig(A'*A));
     opts_fista.xinit = x;
     opts_fista.A=A;
@@ -117,12 +120,14 @@ for iter = 1 : opts.maxIter
     % % % % % % % % % %
     % Joint  update % %
     % % % % % % % % % %
-    [ param_est , x , ~ ] = Joint_updt( y , param_est , x , opts.lambda , opts.B , opts.atom , opts.datom , opts.cplx );
+    % update alpha and theta together
+    %[ param_est , x , ~ ] = Joint_updt( y , param_est , x , opts.lambda , opts.B , opts.atom , opts.datom , opts.cplx );
     
     
     % % % % %
     % Merge %
     % % % % %
+    % merge many spikes that are closed 
     [ param_est , x , t ] = merge( y , param_est , x , opts.lambda , M , opts.atom , opts.datom , opts.B , opts.mergeStep , opts.cplx );
     
     A = opts.atom(param_est);
@@ -229,7 +234,7 @@ coeff = alpha.*exp(1i*gamma);
 A = atom(theta);
 dA = datom(theta);
 res = y-A*coeff;
-fc = .5*norm(res,2)^2+lambda*norm(alpha,1);
+fc = .5*norm(res,2)^2+lambda*norm(alpha,1); %***************************************
 
 grad_theta = -real(res'*dA*diag(coeff));
 grad_alpha = -(real(res'*A*diag(exp(1i*gamma)))).'+lambda;

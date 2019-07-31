@@ -17,7 +17,7 @@ rng(1)      % set the seed
 % Simulation %
 %%%%%%%%%%%%%%
 
-simu_opts = bsimuxy('2dgaussian');    % select the type of data to be simulated. possible choices are: 'doa' , 'gaussian' , 'dgaussian')
+simu_opts = bsimu('2dgaussian');    % select the type of data to be simulated. possible choices are: 'doa' , 'gaussian' , 'dgaussian')
 
 [ param , coef , y , A_simu] = simu_opts.simu(K,SNR);  % simulate the observation vector
 
