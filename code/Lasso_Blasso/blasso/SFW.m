@@ -121,7 +121,7 @@ for iter = 1 : opts.maxIter
     % Joint  update % %
     % % % % % % % % % %
     % update alpha and theta together
-    %[ param_est , x , ~ ] = Joint_updt( y , param_est , x , opts.lambda , opts.B , opts.atom , opts.datom , opts.cplx );
+    [ param_est , x , ~ ] = Joint_updt( y , param_est , x , opts.lambda , opts.B , opts.atom , opts.datom , opts.cplx );
     
     
     % % % % %
@@ -198,23 +198,37 @@ end
 
 function [ param , coeff , t ] = Joint_updt( y , param , coeff , lambda , B , atom , datom , cplx )
 
-n = length(param);
-X = [param(:);abs(coeff);angle(coeff)];
+n = length(param(1,:));
 
-A = [ -eye(n) , zeros(n,2*n) ;...
-    eye(n) , zeros(n,2*n) ;...
-    zeros(n) , -eye(n) , zeros(n,n)];
-b = [ -ones(n,1)*B(1) ; ones(n,1)*B(2) ; zeros(n,1) ];
+X = [param(1,:)';abs(coeff);angle(coeff)];
+Y = [param(2,:)';abs(coeff);angle(coeff)];
+XY = [X Y];
 
-fobj = @(X) joint_cost( y , X , lambda , atom , datom , cplx );
+
+Ax = [ -eye(n) , zeros(n,2*n), zeros(n,3*n) ;...
+    eye(n) , zeros(n,2*n), zeros(n,3*n) ;...
+    zeros(n) , -eye(n) , zeros(n,n), zeros(n, 3*n)];
+bx = [ -ones(n,1)*B(1,1) ; ones(n,1)*B(2,1) ; zeros(n,1) ];
+
+Ay = [ zeros(n,3*n),-eye(n) , zeros(n,2*n) ;...
+    zeros(n,3*n), eye(n) , zeros(n,2*n) ;...
+    zeros(n,3*n), zeros(n) , -eye(n) , zeros(n,n)];
+by = [ -ones(n,1)*B(1,2) ; ones(n,1)*B(2,2) ; zeros(n,1) ];
+
+
+A = [Ax; Ay];
+
+b = [bx;by];
+
+fobj = @(XY0) joint_cost( y , XY0 , lambda , atom , datom , cplx );
 options = optimoptions(@fmincon,'Display','off','GradObj','on','DerivativeCheck','off','Algorithm','sqp');
-[ X ] = fmincon(fobj,X,A,b,[],[],[],[],[],options);
+[ XY ] = fmincon(fobj,XY,A,b,[],[],[],[],[],options);
 
-param = X(1:n)';
+param = XY(1:n,:)';
 if(cplx)
-    coeff = X(n+1:2*n).*exp(1i*X(2*n+1:3*n));
+    coeff = XY(n+1:2*n,:).*exp(1i*XY(2*n+1:3*n,:));
 else
-    coeff = real(X(n+1:2*n).*exp(1i*X(2*n+1:3*n)));
+    coeff = real(XY(n+1:2*n,1).*exp(1i*XY(2*n+1:3*n,1)));
 end
 t = norm(coeff,1);
 
@@ -225,18 +239,25 @@ function [fc,grad] = joint_cost( y , X , lambda , atom , datom , cplx )
 
 l = (length(X))/3;
 
-theta = (X(1:l))';
-alpha = X(l+1:2*l);
-gamma = X(2*l+1:3*l);
+theta = (X(1:l,:))';
+alpha = X(l+1:2*l,1);
+gamma = X(2*l+1:3*l,1);
 
 coeff = alpha.*exp(1i*gamma);
 
 A = atom(theta);
 dA = datom(theta);
 res = y-A*coeff;
-fc = .5*norm(res,2)^2+lambda*norm(alpha,1); %***************************************
+fc = .5*norm(res,2)^2+lambda*norm(alpha,1);
 
-grad_theta = -real(res'*dA*diag(coeff));
+coeffxy = [];
+
+for i = 1: length(coeff)
+   
+    coeffxy = [coeffxy coeff(i,1)*ones(1,2)];
+    
+end
+grad_theta = -real(res'*dA*diag(coeffxy));
 grad_alpha = -(real(res'*A*diag(exp(1i*gamma)))).'+lambda;
 if(cplx)
     grad_gamma = imag(res'*A*diag(coeff)).';
@@ -244,7 +265,7 @@ else
     grad_gamma = zeros(l,1);
 end
 
-grad = [grad_theta';grad_alpha;grad_gamma];
+grad = [grad_theta(1:2:length(grad_theta))';grad_alpha;grad_gamma;grad_theta(2:2:length(grad_theta))';grad_alpha;grad_gamma];
 
 end
 

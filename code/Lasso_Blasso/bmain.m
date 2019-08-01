@@ -1,6 +1,6 @@
 clear
 close all;
-clc
+
 
 addpath(genpath('./simu'))
 addpath(genpath('./lasso'))
@@ -8,7 +8,7 @@ addpath(genpath('./dictgen'))
 addpath(genpath('./blasso'))
 
 N = 100;    % size of the dictionary A : M*N
-K = 3;      % number of sources in the simulated signal
+K = 4;      % number of sources in the simulated signal
 SNR = inf;  % input snr
 rng(1)      % set the seed
 
