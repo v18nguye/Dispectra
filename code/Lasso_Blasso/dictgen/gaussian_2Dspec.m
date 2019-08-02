@@ -53,7 +53,7 @@ sig = [sigx, sigy]';
 radi = 0:s:r;
 
 % angle
-theta = 0:pi/18:2*pi;
+theta = 0:pi/36:2*pi;
 
 [rradi, ttheta] = meshgrid(radi, theta);
 
@@ -77,7 +77,7 @@ rsigxym = bsxfun(@times,shiftdim(1./sig,-2),xym);
 
 XY = sum(rsigxym.*rsigxym,3);
 
-spec0 = (1/(2*pi*sigx*sigy))*exp(-0.5*XY);
+spec0 = (1/(2*pi*sqrt(sigx*sigy)))*exp(-0.5*XY);
 
 %
 % represent the spectrum on the cartesian coordinate.

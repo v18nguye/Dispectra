@@ -6,7 +6,7 @@ addpath(genpath('./simu'))
 
 M = 101;    % size of the observation vector y : M*1
 N = 100;    % size of the dictionary A : M*N
-K = 5;      % number of sources in the simulated signal
+K = 2;      % number of sources in the simulated signal
 SNR = inf;  % input snr
 rng(1)      % set the seed
 
@@ -14,7 +14,7 @@ rng(1)      % set the seed
 %%%%%%%%%%%%%%
 % Simulation %
 %%%%%%%%%%%%%%
-simu_opts = simu_prop( 'doa' , M );    % select the type of data to be simulated. possible choices are: 'doa' , 'gaussian' , 'dgaussian')
+simu_opts = simu_prop( 'gaussian' , M );    % select the type of data to be simulated. possible choices are: 'doa' , 'gaussian' , 'dgaussian')
 
 [ theta_y , x_y , y ] = simu_opts.simu(K,SNR);  % simulate the observation vector
 

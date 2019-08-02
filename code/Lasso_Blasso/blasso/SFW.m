@@ -128,7 +128,7 @@ for iter = 1 : opts.maxIter
     % Merge %
     % % % % %
     % merge many spikes that are closed 
-%    [ param_est , x , t ] = merge( y , param_est , x , opts.lambda , M , opts.atom , opts.datom , opts.B , opts.mergeStep , opts.cplx );
+    %[ param_est , x , t ] = merge( y , param_est , x , opts.lambda , M , opts.atom , opts.datom , opts.B , opts.mergeStep , opts.cplx );
     
     A = opts.atom(param_est);
     Ax  = opts.atom(param_est)*x;

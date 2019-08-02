@@ -26,7 +26,7 @@
 % Created: July 2019
 
 
-function [ y, x_gt, pst, ampt] = simu_spec( k, A, SNR)
+function [ y, pst, ampt] = simu_spec( k, A, SNR)
 
 %
 % Here we simulate k spectrum units that are closed together. The maximum
@@ -46,13 +46,13 @@ if (0 < k) && (k <= 3)
     r = randperm(num_of_spec,1);
     
     % vector contains at most the closed 3 spectrum unit positions. 
-    r_vec = r:1:r+1*(k-1);
+    r_vec = r:10:r+10*(k-1);
     r_vec = mod(r_vec,num_of_spec +1);
     
     % the ground truth vector.
     x = zeros(num_of_spec,1);
     
-    x(r_vec) = 1;
+    x(r_vec) = randn(k,1);
     
     % generate the signal y.
     y0 = A*x;
@@ -66,7 +66,6 @@ if (0 < k) && (k <= 3)
     
     y = y0;
     
-    x_gt = x;
     
     pst = r_vec;
     
@@ -92,7 +91,7 @@ else
     % the ground truth vector.
     x = zeros(num_of_spec,1);
     
-    x(r_vec) = 1;
+    x(r_vec) = randn(k,1);
     
     % generate the signal y.
     y0 = A*x;
@@ -105,8 +104,6 @@ else
     y0 = y0 + n;
     
     y= y0;
-    
-    x_gt = x;
     
     pst = r_vec;
     

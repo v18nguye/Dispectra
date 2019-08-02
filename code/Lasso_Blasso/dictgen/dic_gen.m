@@ -3,17 +3,15 @@
 % This function generates a dictionary which contains artificial spectral
 % wave elements.
 %
-% Usage:  dict = dic_gen( r, s, re, se)
+% Usage:  dict = dic_gen( r, s, r_spec, s_spec)
 %
-% r - the radius of dictionary which is used to put a limit to dictionary
-% element coordinations.
+% r - the radius of mean coordinations.
 %
-% s - the sampling step
+% s - the sampling step for mean coordinations.
 %
-% re - the radius of dictionary elements which is used to generate
-% spectrum units.
+% r_spec - the radius of specs.
 %
-% se - the sampling step of dictionary elements
+% s_spec - the sampling step for the spec radius.
 %
 % Return:
 %
@@ -27,11 +25,13 @@
 % 
 % ye - coordinations of dictionary element along to the y axis.
 %
+% u_cordi - the mean coordinations corresponding to each dict element.
+%
 % Written by: Van-Khoa NGUYEN
 % Email: van-khoa.nguyen@imt-atlantique.net
 % Created: July 2019.
 
-function [dict, dez, xe, ye] = dic_gen( r, s, re, se)
+function [dict, dez, xe, ye, u_cordi] = dic_gen( r, s, r_spec, s_spec)
 
 %
 % generate the polar coordinations.
@@ -39,7 +39,7 @@ function [dict, dez, xe, ye] = dic_gen( r, s, re, se)
 
 radi = 0:s:r;
 
-thetha = 0:pi/18:2*pi;
+thetha = 0:pi/36:2*pi;
 
 [rradi, ttheta] = meshgrid(radi, thetha);
 
@@ -55,6 +55,8 @@ thetha = 0:pi/18:2*pi;
 
 dict0 = [];
 
+u_cordi0 = [];
+
 dez0 = [];
 
 xe0 = [];
@@ -63,14 +65,17 @@ ye0 = [];
 
 [kr, kc] = size(x);
 
+
 for i = 1:kr
     
     for j = 1:kc
         
         % e represents for 'element'
-        [dict_e, e_size, xxe, yye] = gaussian_2Dspec(re,se,x(i,j),y(i,j));
+        [dict_e, e_size, xxe, yye] = gaussian_2Dspec(r_spec,s_spec,x(i,j),y(i,j));
         
         dict0 = [dict0 dict_e];
+        
+        u_cordi0 = [u_cordi0 [x(i,j) y(i,j)]'];
         
         dez0 = e_size;
         
@@ -82,6 +87,8 @@ for i = 1:kr
 end
 
 dict = dict0; 
+
+u_cordi = u_cordi0;
 
 dez = dez0;
 
