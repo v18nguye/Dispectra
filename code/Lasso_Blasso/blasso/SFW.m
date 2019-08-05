@@ -128,7 +128,7 @@ for iter = 1 : opts.maxIter
     % Merge %
     % % % % %
     % merge many spikes that are closed 
-    %[ param_est , x , t ] = merge( y , param_est , x , opts.lambda , M , opts.atom , opts.datom , opts.B , opts.mergeStep , opts.cplx );
+    [ param_est , x , t ] = merge( y , param_est , x , opts.lambda , M , opts.atom , opts.datom , opts.B , opts.mergeStep , opts.cplx );
     
     A = opts.atom(param_est);
     Ax  = opts.atom(param_est)*x;
@@ -280,36 +280,42 @@ opts_fista.tol = 1.e-8;
 opts_fista.disp = false;
 
 while true
+    
     residual = atom(param)*coeff-y;
     InitObj = lasso_FObj( residual , lambda , coeff );
     Ddist = triu(squareform(pdist(param')));
     Ddist(Ddist==0)=nan;
     Ddist(Ddist>dist_step) = nan;
     
-    while(nnz(~isnan(Ddist(:)))~=0)
+    
+    while (nnz(~isnan(Ddist(:,:)))~=0)
         
         m = min(Ddist(:));
         [p1,p2] = find(Ddist==m,1);
         idx_p = sort([p1,p2]);
         
-        param_new = mean(param(idx_p));
-        
+        param_new = mean(param(:,idx_p),2);
+                
         param_temp = param;
-        param_temp(idx_p(2))=[];
-        param_temp(idx_p(1))=[];
+        param_temp(:,idx_p(2))=[];
+        param_temp(:,idx_p(1))=[];
         coeff_temp = coeff;
         coeff_temp(idx_p(2))=[];
         coeff_temp(idx_p(1))=[];
         t_temp = norm(coeff_temp,1);
+        
+              
         A_temp = atom(param_temp);
         residual = A_temp*coeff_temp-y;
         
         % atom selection
         fObj = @(param) min_scal_prod2(residual,param,atom,datom);
-        C = [ -1 ; 1 ];
-        b = [ -B(1); B(2) ];
+        %C = [ -1 ; 1 ];
+        %b = [ -B(1); B(2) ];
+        A = [ -1  0;1 0; 0 -1;0 1];
+        b = [-B(1,1); B(2,1) ;-B(1,2); B(2,2) ];
         options = optimoptions(@fmincon,'Display','off','GradObj','on','Algorithm','sqp');
-        param_new = fmincon(fObj,param_new,C,b,[],[],[],[],[],options);
+        param_new = fmincon(fObj,param_new,A,b,[],[],[],[],[],options);
         val_new = scal_prod( residual , param_new , atom );
         if(lambda>=abs(val_new))
             [ coeff_temp , ~] = std_FW_update_v1( residual , A_temp , coeff_temp , t , M , lambda );
