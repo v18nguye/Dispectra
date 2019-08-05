@@ -17,7 +17,7 @@ SNR = inf;  % input snr.
 
 % simulated parameters.
 dict_simu = false;
-lasso_spec_simu = false;
+lasso_spec_simu = true;
 
 % parameters in the discret dictionary case (lasso).
 r_spec = 6; % the spec radius.
@@ -95,29 +95,29 @@ optsb.tol = 1.e-5;
 optsb.disp = true;
 
 % method parmeters in the lasso case.
-%optsl.A = dict;
-%lambda_lambdaMax = .01;
+optsl.A = dict;
+lambda_lambdaMax = .01;
 
-%lambdaMax = norm(optsl.A'*y,inf);
+lambdaMax = norm(optsl.A'*y,inf);
 
-%optsl.lambda = lambda_lambdaMax*lambdaMax;
-%optsl.maxIter = 10000;
-%optsl.tol = 1.e-5;
-%optsl.disp = true;
+optsl.lambda = lambda_lambdaMax*lambdaMax;
+optsl.maxIter = 10000;
+optsl.tol = 1.e-5;
+optsl.disp = true;
 
 %%
 %%%%%%%%%
 % Fista %
 %%%%%%%%%
-%dict_siz = size(dict);
-%N = dict_siz(2); % number of the dictionary elements 
-%optsl.L = max(eig(optsl.A'*optsl.A));
-%optsl.xinit = zeros(N,1);
+dict_siz = size(dict);
+N = dict_siz(2); % number of the dictionary elements 
+optsl.L = max(eig(optsl.A'*optsl.A));
+optsl.xinit = zeros(N,1);
 
-optsb.L = max(eig(optsb.A'*optsb.A));
-optsb.xinit = zeros(N*N,1);
+optsl.L = max(eig(optsl.A'*optsl.A));
+optsl.xinit = zeros(N*N,1);
 
-[x_FISTA_lasso , fc_FISTA_lasso , fc_FISTA_lassodual] = fista( y , optsb );
+%[x_FISTA_lasso , fc_FISTA_lasso , fc_FISTA_lassodual] = fista( y , optsl );
 
 
 %%
