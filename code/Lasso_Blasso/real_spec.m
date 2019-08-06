@@ -8,6 +8,7 @@ addpath(genpath('./simu'))
 addpath(genpath('./lasso'))
 addpath(genpath('./dictgen'))
 addpath(genpath('./blasso'))
+addpath(genpath('./WW3'))
 
 %%
 % spec file parameters
@@ -58,8 +59,10 @@ Efth = SPC.efth([1:end,1],:,i1);
 %% sfw method
 
 % initiate a simulation in the continuous dict case (blasso).
-b_range = [1.5*min(min(fx)) 1.5*min(min(fy)); 1.5*max(max(fx)) 1.5*max(max(fy))];
-N = 100;
+rangexy = [1.5*min(min(fx)) 1.5*min(min(fy)); 1.5*max(max(fx)) 1.5*max(max(fy))];
+range_sigxy2 = [0.1 0.1;1 1];
+b_range = cat(3,rangexy,range_sigxy2);
+N = 30;
 y = reshape(Efth,[],1);
 simu_opts = real_spec_blasso('2dgaussian', b_range, fx, fy);
 
@@ -81,14 +84,16 @@ optsb.tol = 1.e-5;
 optsb.disp = true;
 
 optsb.mergeStep = .01;
-[param_SFW_blasso, x_SFW_blasso , fc_SFW_blasso , fc_SFW_lasso , fc_SFW_lassodual ] = SFW( y , optsb );
+[param_SFW_blasso, x_SFW_blasso , fc_SFW_blasso , fc_SFW_lasso , fc_SFW_lassodual ] = real_spec_SFW( y , optsb );
+
+y_blasso = optsb.atom(param_SFW_blasso)*x_SFW_blasso;
 
 %%
 if true 
     % polar plot of the spectrum
     figure('Name',sprintf('Wave Spectrum for %s (%s)', pnt_name, datestr(MatTime)))
     pcolor(fx,fy,Efth)
-    shading interp
+    shading flat
     cb = colorbar;
     set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')
 
@@ -98,5 +103,12 @@ if true
         'string',{...
         '1 system found :', ...
         sprintf('Hs(WS) = %4.1f m ; Dir(WS) =%3d deg',IWP.phs0(i2),IWP.pdir0(i2))})
+    
+    
+    figure('Name',sprintf('WS recovered by sfw for %s (%s)', pnt_name, datestr(MatTime)))
+    pcolor(fx,fy,reshape(y_blasso,size(Efth)))
+    shading flat
+    cb = colorbar;
+    set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')
 end
 
