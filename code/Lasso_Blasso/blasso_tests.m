@@ -11,7 +11,7 @@ N = 100;    % size of the dictionary A
 K = 5;      % number of sources in the simulated signal
 SNR = inf;  % input snr
 rng(1)      % set the seed
-range = [-4 -4; 4 4]; % range of xy
+range = [-4 -4; 4 4]; % range of uxy
 r_spec = 6; % the radius of spec
 s_spec = 0.1; % the sampling of spec
 

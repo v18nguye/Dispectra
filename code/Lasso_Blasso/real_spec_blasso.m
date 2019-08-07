@@ -14,14 +14,14 @@ switch dico
         atom = @(usigxy) atom_2dgaussian(usigxy,fx,fy);
         datom = @(usigxy) datom_2dgaussian(usigxy,fx,fy);
         cplx = false;
-        %simu = @(k,SNR) signal(k,SNR,p_range,atom,cplx);
+        simu = @(k,SNR) signal(k,SNR,p_range,atom,cplx);
         
 end
 opts.cplx= cplx;
 opts.p_range = p_range;
 opts.atom = atom;
 opts.datom = datom;
-%opts.simu = simu;
+opts.simu = simu;
 opts.test_grid = @(N) make_grid(N,p_range);
 end
 
@@ -190,9 +190,12 @@ end
 
 function [param,coeff,y] = signal(k,SNR,p_range,atom,cplx)
 
-paramx = rand(1,k)*(p_range(2,1)-p_range(1,1))+p_range(1,1);
-paramy = rand(1,k)*(p_range(2,2)-p_range(1,2))+p_range(1,2);
-param = [paramx; paramy];
+paramx = rand(1,k)*(p_range(2,1,1)-p_range(1,1,1))+p_range(1,1,1);
+paramy = rand(1,k)*(p_range(2,2,1)-p_range(1,2,1))+p_range(1,2,1);
+sigx = rand(1,k)*(p_range(2,1,2)-p_range(1,1,2))+p_range(1,1,2);
+sigy = rand(1,k)*(p_range(2,2,2)-p_range(1,2,2))+p_range(1,2,2);
+
+param = [paramx; paramy; sigx; sigy];
 
 if(cplx)
     coeff = randn(k,1)+1i*randn(k,1);
