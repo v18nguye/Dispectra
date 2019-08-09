@@ -166,14 +166,16 @@ end
 
 function [param,coeff,y] = signal(k,SNR,p_range,atom,cplx)
 
-paramx = rand(1,k)*(p_range(2,1)-p_range(1,1))+p_range(1,1);
-paramy = rand(1,k)*(p_range(2,2)-p_range(1,2))+p_range(1,2);
+%paramx = rand(1,k)*(p_range(2,1)-p_range(1,1))+p_range(1,1);
+%paramy = rand(1,k)*(p_range(2,2)-p_range(1,2))+p_range(1,2);
+paramx = rand(1,k)*0.2*(p_range(2,1)-p_range(1,1))+p_range(1,1);
+paramy = rand(1,k)*0.2*(p_range(2,2)-p_range(1,2))+p_range(1,2);
 param = [paramx; paramy];
 
 if(cplx)
     coeff = randn(k,1)+1i*randn(k,1);
 else
-    coeff = randn(k,1);
+    coeff = randn(k,1)+2;
 end
 y = atom(param)*coeff;
 n = randn(size(y));

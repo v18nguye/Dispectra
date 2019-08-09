@@ -17,7 +17,7 @@ rng(1)      % set the seed.
 
 % simulated parameters.
 dict_simu = false;
-lasso_spec_simu = true;
+lasso_spec_simu = false;
 
 % parameters in the discret dictionary case (lasso).
 r_spec = 6; % the spec radius.
@@ -74,15 +74,38 @@ else
     disp('Simulate spec by using the atom in the blasso case !')
     [ paramgt , coef , y] = simu_opts.simu(K,SNR);
     
+    % draw the spectra units
+    if false
+
+        %figure('Name','the spectra units')
+        figure
+        cb = colorbar('Direction', 'normal');
+        set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')
+        for i = 1:length(coef)
+            subplot(ceil(length(coef)/2),2,i);
+            pcolor(xe,ye,reshape( simu_opts.atom(paramgt(:,i))*coef(i,1),dez))
+            shading interp
+            title(['u_xy[',num2str(paramgt(1,i)),' ',num2str(paramgt(2,i)),']', ' - a: ', num2str(coef(i,1))]); 
+        end
+        
+    end
+    
 end
+
 
 % draw the simulated spec.
 if true
     
+    %figure('Name','simulated spectra')
     figure
-    pcolor(xe,ye,reshape(y,dez))
-    title('simulated spectrum')
+    s= pcolor(xe,ye,reshape(y,dez));
+    %title('3 separated spectra units')
     shading interp
+    
+    cb = colorbar('Direction', 'normal');
+    set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')
+    colormap parula
+
 end
 
 %%
@@ -110,9 +133,52 @@ lambda_lambdaMax = .01;
 lambdaMax = norm(optsl.A'*y,inf);
 
 optsl.lambda = lambda_lambdaMax*lambdaMax;
-optsl.maxIter = 10000;
+optsl.maxIter = 20000;
 optsl.tol = 1.e-5;
 optsl.disp = true;
+
+%%
+%%%%%%%%%%%%%%
+% SFW-blasso %
+%%%%%%%%%%%%%%
+tic
+optsb.mergeStep = .01;
+[param_SFW_blasso, x_SFW_blasso , fc_SFW_blasso , fc_SFW_lasso , fc_SFW_lassodual ] = SFW( y , optsb );
+toc
+
+% draw wave spec units obtained by SWF method.
+if true
+    
+    figure('Name','SFW-Blasso');
+    x_sfw_size = size(x_SFW_blasso);
+    x_sfw_size = x_sfw_size(1);
+    
+    x_SFW_blasso2 = []; % for drawing the spectra units that have the coefficients large enough.
+    param_SFW_blasso2 = [];
+    for k = 1: x_sfw_size
+        if abs(x_SFW_blasso(k,1)) > 0.1
+            x_SFW_blasso2 = [x_SFW_blasso2; x_SFW_blasso(k,1)];
+            param_SFW_blasso2 = [param_SFW_blasso2 param_SFW_blasso(:,k)];
+        end
+    end
+    
+    x_sfw_size2 = size(x_SFW_blasso2);
+    x_sfw_size2 = x_sfw_size2(1);
+    
+    for k = 1: x_sfw_size2
+        
+        subplot(ceil(x_sfw_size2/3),3,k);
+        pcolor(xe,ye,reshape(optsb.atom(param_SFW_blasso2(:,k)),dez));
+        shading interp
+        
+        %cb = colorbar('Direction', 'normal');
+        %set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')
+        %colormap parula
+        % uxy = [ux uy] - the mean values along 2 axis.
+        % a - amplitude.
+        title(['u_xy[',num2str(param_SFW_blasso2(1,k)),' ',num2str(param_SFW_blasso2(2,k)),']', ' - a: ', num2str(x_SFW_blasso2(k,1))]); 
+    end
+end
 
 %%
 %%%%%%%%%
@@ -124,12 +190,13 @@ optsl.L = max(eig(optsl.A'*optsl.A));
 optsl.xinit = zeros(N,1);
 
 optsl.L = max(eig(optsl.A'*optsl.A));
-tic
-[x_FISTA_lasso , fc_FISTA_lasso , fc_FISTA_lassodual] = fista( y , optsl );
-toc
+%tic
+%[x_FISTA_lasso , fc_FISTA_lasso , fc_FISTA_lassodual] = fista( y , optsl );
+%xorigin_FISTA_lasso = x_FISTA_lasso;
+%toc
 
 % draw spec units obtained by fista method.
-if true
+if false
     
     % seuillage de x_FISTA_lasso
     for i = 1:N
@@ -162,33 +229,6 @@ end
 
 %%
 %%%%%%%%%%%%%%
-% SFW-blasso %
-%%%%%%%%%%%%%%
-tic
-optsb.mergeStep = .01;
-[param_SFW_blasso, x_SFW_blasso , fc_SFW_blasso , fc_SFW_lasso , fc_SFW_lassodual ] = SFW( y , optsb );
-toc
-
-% draw wave spec units obtained by SWF method.
-if true
-    
-    figure('Name','SFW-Blasso');
-    x_sfw_size = size(x_SFW_blasso);
-    x_sfw_size = x_sfw_size(1);
-    
-    for k = 1: x_sfw_size
-        
-        subplot(ceil(x_sfw_size/3),3,k);
-        pcolor(xe,ye,reshape(optsb.atom(param_SFW_blasso(:,k)),dez));
-        shading interp
-        % uxy = [ux uy] - the mean values along 2 axis.
-        % a - amplitude.
-        title(['u_xy[',num2str(param_SFW_blasso(1,k)),' ',num2str(param_SFW_blasso(2,k)),']', ' - a: ', num2str(x_SFW_blasso(k,1))]); 
-    end
-end
-
-%%
-%%%%%%%%%%%%%%
 % Figures    %
 %%%%%%%%%%%%%%
 
@@ -197,7 +237,7 @@ end
 % axis y representing the gaussian mean value along y axis.
 % axis z representing the altitude of the gaussian wave specs.
 
-if true    
+if false    
     figure
     
     % draw the groud truth

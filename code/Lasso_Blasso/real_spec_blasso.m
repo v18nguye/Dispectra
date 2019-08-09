@@ -178,8 +178,8 @@ Bsigxy2 = B(:,:,2);
 Gx = Bxy(1,1):(Bxy(2,1)-Bxy(1,1))/(N-1):Bxy(2,1);
 Gy = Bxy(1,2):(Bxy(2,2)-Bxy(1,2))/(N-1):Bxy(2,2);
 
-Gsigx = Bsigxy2(1,1):(Bsigxy2(2,1)-Bsigxy2(1,1))/(5-1):Bsigxy2(2,1);
-Gsigy = Bsigxy2(1,2):(Bsigxy2(2,2)-Bsigxy2(1,2))/(5-1):Bsigxy2(2,2);
+Gsigx = Bsigxy2(1,1):(Bsigxy2(2,1)-Bsigxy2(1,1))/(9-1):Bsigxy2(2,1);
+Gsigy = Bsigxy2(1,2):(Bsigxy2(2,2)-Bsigxy2(1,2))/(9-1):Bsigxy2(2,2);
 
 [X,Y, sigx, sigy] = ndgrid(Gx, Gy, Gsigx, Gsigy);
 

@@ -15,7 +15,7 @@ addpath(genpath('./blasso'))
 K = 3;      % number of sources in the simulated signal.
 SNR = inf;  % input snr.
 rng(1)      % set the seed.
-N = 30; % number of sampling coordination on each axis.
+N = 100; % number of sampling coordination on each axis.
 rangeuxy = [-4 -4; 4 4]; % range of uxy
 rangesigxy = [0.1 0.1; 1 1];
 range = cat(3,rangeuxy,rangesigxy);
@@ -54,7 +54,7 @@ lambda_lambdaMax = .01;
 lambdaMax = norm(optsb.A'*y,inf);
 
 optsb.lambda = lambda_lambdaMax*lambdaMax;
-optsb.maxIter = 10000;
+optsb.maxIter = 100;
 optsb.tol = 1.e-5;
 optsb.disp = true;
 
