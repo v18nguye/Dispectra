@@ -1,3 +1,0 @@
-# BLasso
-
-Toolbox BLASSO

@@ -51,7 +51,7 @@ figure('Name',sprintf('Wave Spectrum for %s (%s)', pnt_name, datestr(MatTime)))
 [ffreq,ttheta] = meshgrid(freq,theta);
 [fx,fy] = pol2cart(ttheta,ffreq);
 pcolor(fx,fy,Efth)
-shading interp
+shading flat
 cb = colorbar;
 set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')
 
@@ -72,7 +72,7 @@ fx2(2:26,2:31) = fx;
 fy2(2:26,2:31) = fy; 
 Efth2(2:26,2:31) = Efth;
 pcolor(fx2,fy2,Efth2);
-shading interp
+shading flat
 cb = colorbar;
 set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')
 annotation('textbox',[0.05 0.20 0.01 0.01],'FitBoxToText','on',...
@@ -108,7 +108,7 @@ figure('Name',tit)
 [ffreq,ttheta] = meshgrid(freq,theta);
 [fx,fy] = pol2cart(ttheta,ffreq);
 pcolor(fx,fy,Efth)
-shading interp
+shading flat
 cb = colorbar;
 set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')
 title(tit,'fontsize',10)
@@ -131,7 +131,7 @@ fx2(2:26,2:31) = fx;
 fy2(2:26,2:31) = fy; 
 Efth2(2:26,2:31) = Efth;
 pcolor(fx2,fy2,Efth2);
-shading interp
+shading flat
 cb = colorbar;
 set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')
 title(tit,'fontsize',10)
@@ -168,7 +168,7 @@ figure('Name',sprintf('Wave Spectrum for %s (%s)', pnt_name, datestr(MatTime)))
 [ffreq,ttheta] = meshgrid(freq,theta);
 [fx,fy] = pol2cart(ttheta,ffreq);
 pcolor(fx,fy,Efth)
-shading interp
+shading flat
 cb = colorbar;
 set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')
 title(tit,'fontsize',10)
@@ -189,7 +189,7 @@ fx2(2:26,2:31) = fx;
 fy2(2:26,2:31) = fy; 
 Efth2(2:26,2:31) = Efth;
 pcolor(fx2,fy2,Efth2);
-shading interp
+shading flat
 cb = colorbar;
 set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')
 title(tit,'fontsize',10)
@@ -226,7 +226,7 @@ figure('Name',sprintf('Wave Spectrum for %s (%s)', pnt_name, datestr(MatTime)))
 [ffreq,ttheta] = meshgrid(freq,theta);
 [fx,fy] = pol2cart(ttheta,ffreq);
 pcolor(fx,fy,Efth)
-shading interp
+shading flat
 cb = colorbar;
 set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')
 title(tit,'fontsize',10)
@@ -249,7 +249,7 @@ fx2(2:26,2:31) = fx;
 fy2(2:26,2:31) = fy; 
 Efth2(2:26,2:31) = Efth;
 pcolor(fx2,fy2,Efth2);
-shading interp
+shading flat
 cb = colorbar;
 set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')
 title(tit,'fontsize',10)

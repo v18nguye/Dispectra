@@ -1,0 +1,17 @@
+1. Simulate 3 cases for a discrete gaussian dictionary(two or more than distant spectrums, two or more than closed spectrums, 
+two or more overlaying spectrums).
+
++ the variance (sigma) isn't changed.
++ the variance (sigma) is changed.
+
++ show the variance in results.
+
+=> Do the same experiences for a continuous gaussian dictionary.
+
+
+2. Do tests on real spectrums based on the contious gaussian dicitionary.
+
+
+3. Research a distribution law that enhances capacity of real spectrum representation, and implemented it in the real dictionary.
+
+4. Comparasion of results between discrete dictionary, continuous dictionary, watershed.
