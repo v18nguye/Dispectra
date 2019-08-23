@@ -31,7 +31,8 @@ mask_p3 = ~isnan(IWP.phs3); % ....
 MatTime_WS = IWP.MatTime(mask_p0 & ~mask_p1 & ~mask_p2 & ~mask_p3);
 
 % select date of first spectrum
-MatTime = MatTime_WS(1);
+MatTime = MatTime_WS(40);
+size(MatTime_WS)
 
 % time indices in files
 b1 = SPC.MatTime;
@@ -45,6 +46,8 @@ freq  = SPC.frequency;
 ang = SPC.direction([1:end,1]);
 theta = mod(-90-SPC.direction([1:end,1]),360) * pi/180;
 Efth = SPC.efth([1:end,1],:,i1);
+size(Efth)
+
 
 % polar plot of the spectrum
 figure('Name',sprintf('Wave Spectrum for %s (%s)', pnt_name, datestr(MatTime)))

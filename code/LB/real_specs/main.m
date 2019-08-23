@@ -5,9 +5,9 @@ clc
 %%
 %load needed paths.
 addpath(genpath('./simu'))
-addpath(genpath('./lasso'))
-addpath(genpath('./blasso'))
-addpath(genpath('./WW3'))
+addpath(genpath('/homes/v18nguye/Documents/intern2019/data/WW3'))
+addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/blasso'))
+addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/lasso'))
 
 %%
 % spec file parameters
@@ -63,7 +63,7 @@ range_sigxy2 = [0.001 0.001;2 2];
 b_range = cat(3,rangexy,range_sigxy2);
 N = 30;
 y = reshape(Efth,[],1);
-simu_opts = blasso4d_simu('4dgaussian', b_range, fx, fy);
+simu_opts = gaussian_4d_simu('4dgaussian', b_range, fx, fy);
 
 % parameters
 optsb.param_grid = simu_opts.test_grid(N);

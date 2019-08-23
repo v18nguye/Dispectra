@@ -5,10 +5,10 @@ clc
 %%
 %load needed paths.
 addpath(genpath('./discre_dict/simu'))
-addpath(genpath('./discre_dict/lasso'))
 addpath(genpath('./discre_dict/dictgen'))
-addpath(genpath('./continu_dict/blasso'))
 addpath(genpath('./continu_dict/simu'))
+addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/blasso'))
+addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/lasso'))
 
 %%
 % initiate parameters.
@@ -63,7 +63,7 @@ end
 
 %%
 % initiate a simulation in the continuous dict case (blasso).
-simu_opts = blasso_simu('2dgaussian', b_range, r_spec, s_spec);
+simu_opts = gaussian_2d_simu('2dgaussian', b_range, r_spec, s_spec);
 
 %%
 % simulate a tested spec.
@@ -147,13 +147,13 @@ optsl.disp = true;
 %%%%%%%%%%%%%%
 tic
 optsb.mergeStep = .01;
-[param_SFW_blasso, x_SFW_blasso , fc_SFW_blasso , fc_SFW_lasso , fc_SFW_lassodual ] = SFW( y , optsb );
+[param_SFW_blasso, x_SFW_blasso , fc_SFW_blasso , fc_SFW_lasso , fc_SFW_lassodual ] = SFW2d( y , optsb );
 toc
 
 % draw wave spec units obtained by SWF method.
 if true
     
-    figure('Name','SFW-Blasso');
+    figure('Name','SFW-Blasso-2d');
     x_sfw_size = size(x_SFW_blasso);
     x_sfw_size = x_sfw_size(1);
     

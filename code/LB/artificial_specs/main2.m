@@ -4,8 +4,9 @@ clc
 
 %%
 %load needed paths.
-addpath(genpath('./continu_dict/blasso'))
 addpath(genpath('./continu_dict/simu'))
+addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/blasso'))
+addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/lasso'))
 
 %%
 % initiate parameters.
@@ -35,7 +36,7 @@ theta = 0:pi/18:2*pi;
 [fx,fy] = pol2cart(ttheta,rradi);
 %%
 % simulation
-simu_opts = blasso4d_simu('4dgaussian',range,fx,fy);    % select the type of data to be simulated. possible choices are: 'doa' , 'gaussian' , 'dgaussian')
+simu_opts = gaussian_4d_simu('4dgaussian',range,fx,fy);    % select the type of data to be simulated. possible choices are: 'doa' , 'gaussian' , 'dgaussian')
 
 [ paramgt , coef , y] = simu_opts.simu(K,SNR);  % simulate the observation vector
 

@@ -1,3 +1,3 @@
 # Sparse Waves
 
-This directory contains the codes for resolving Lasso and Blasso problem (LB)
+This directory contains the codes for resolving Lasso and Blasso problems (LB)

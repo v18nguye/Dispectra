@@ -3,8 +3,8 @@ close all;
 clc
 
 addpath(genpath('./simu'))
-addpath(genpath('./lasso'))
 addpath(genpath('./dictgen'))
+addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/lasso'))
 
 snr = inf; % signal noise ratio input.
 rng = 1; % set the seed.

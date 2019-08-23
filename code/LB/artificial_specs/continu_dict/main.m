@@ -2,9 +2,14 @@ clear
 close all;
 clc
 
-addpath(genpath('./blasso'))
+%%
+%load needed paths.
 addpath(genpath('./simu'))
+addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/blasso'))
+addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/lasso'))
 
+%%
+% simulation parameters.
 N = 100;    % size of the dictionary A
 K = 3;      % number of sources in the simulated signal
 SNR = inf;  % input snr
@@ -13,11 +18,12 @@ range = [-4 -4; 4 4]; % range of uxy
 r_spec = 6; % the radius of spec
 s_spec = 0.1; % the sampling of spec
 
+
 %%
 %%%%%%%%%%%%%%
 % Simulation %
 %%%%%%%%%%%%%%
-simu_opts = blasso_simu('2dgaussian',range,r_spec,s_spec);    % select the type of data to be simulated. possible choices are: 'doa' , 'gaussian' , 'dgaussian')
+simu_opts = gaussian_2d_simu('2dgaussian',range,r_spec,s_spec);    % select the type of data to be simulated. possible choices are: 'doa' , 'gaussian' , 'dgaussian')
 
 [ paramr , coef , y] = simu_opts.simu(K,SNR);  % simulate the observation vector
 
@@ -42,12 +48,13 @@ optsb.maxIter = 100;
 optsb.tol = 1.e-5;
 optsb.disp = true;
 
+
 %%
 %%%%%%%%%%%%%%
 % SFW-blasso %
 %%%%%%%%%%%%%%
 optsb.mergeStep = .01;
-[param_SFW_blasso, x_SFW_blasso , fc_SFW_blasso , fc_SFW_lasso , fc_SFW_lassodual ] = SFW( y , optsb );
+[param_SFW_blasso, x_SFW_blasso , fc_SFW_blasso , fc_SFW_lasso , fc_SFW_lassodual ] = SFW2d( y , optsb );
 
 
 %%
