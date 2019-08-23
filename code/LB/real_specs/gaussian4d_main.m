@@ -57,35 +57,35 @@ Efth = SPC.efth([1:end,1],:,i1);
 
 %% sfw method
 
-% initiate a simulation in the continuous dict case (blasso).
+% initiate a simulation for the continuous dict case (blasso).
 rangexy = [2*min(min(fx)) 2*min(min(fy)); 2*max(max(fx)) 2*max(max(fy))];
 range_sigxy2 = [0.001 0.001;2 2];
 b_range = cat(3,rangexy,range_sigxy2);
 N = 30;
-y = reshape(Efth,[],1);
+y = reshape(Efth,[],1); % spec observation.
 simu_opts = gaussian_4d_simu('4dgaussian', b_range, fx, fy);
 
 % parameters
-optsb.param_grid = simu_opts.test_grid(N);
-optsb.A = simu_opts.atom(optsb.param_grid);
+opts.param_grid = simu_opts.test_grid(N);
+opts.A = simu_opts.atom(opts.param_grid);
 
-optsb.atom = simu_opts.atom;
-optsb.datom = simu_opts.datom;
-optsb.B = simu_opts.p_range;
-optsb.cplx = simu_opts.cplx;
+opts.atom = simu_opts.atom;
+opts.datom = simu_opts.datom;
+opts.B = simu_opts.p_range;
+opts.cplx = simu_opts.cplx;
 
 lambda_lambdaMax = .01;
-lambdaMax = norm(optsb.A'*y,inf);
+lambdaMax = norm(opts.A'*y,inf);
 
-optsb.lambda = lambda_lambdaMax*lambdaMax;
-optsb.maxIter = 200;
-optsb.tol = 1.e-5;
-optsb.disp = true;
+opts.lambda = lambda_lambdaMax*lambdaMax;
+opts.maxIter = 200;
+opts.tol = 1.e-5;
+opts.disp = true;
 tic
-optsb.mergeStep = .01;
-[param_SFW_blasso, x_SFW_blasso , fc_SFW_blasso , fc_SFW_lasso , fc_SFW_lassodual ] = SFW4d( y , optsb );
+opts.mergeStep = .01;
+[param_SFW_blasso, x_SFW_blasso , fc_SFW_blasso , fc_SFW_lasso , fc_SFW_lassodual ] = SFW4d( y , opts );
 toc
-y_blasso = optsb.atom(param_SFW_blasso)*x_SFW_blasso;
+y_blasso = opts.atom(param_SFW_blasso)*x_SFW_blasso;
 
 %%
 if true 

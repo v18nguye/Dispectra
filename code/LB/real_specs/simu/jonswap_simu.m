@@ -11,7 +11,7 @@ function [ opts ] = jonswap_simu(dico,gam,range)
 %   gam - the shape parameter of the JONSWAP type frequency spectrum.
 %   range - the range of the estimated parameters shown as follow:
 %           range(:,:,1) =[Hmin Tmin ; Hmax Tmax]
-%           range(:,:,2) =[cmin theta0min; cmin theta0min]
+%           range(:,:,2) =[cmin theta0min; cmax theta0max]
 %           + H: the significant wave height (1/3 of the highest wave).
 %           + T: the significant wave period (1/3 of the longest period).
 %           + c: the Misuyasu-type spreading function's parameter.
@@ -28,8 +28,11 @@ function [ opts ] = jonswap_simu(dico,gam,range)
 switch dico
     case 'jonswap'
         p_range = range;
-        atom = @() atom_jonswap(param, w, theta, gam);
-        datom = @() datom_jonswap(param, w, theta, gam);
+        freq = linspace(0,10,100); % the frequency range
+        theta = linspace(0,2*pi,36); % the theta range
+        [ffreq,ttheta] = meshgrid(freq,theta);
+        atom = @(param) atom_jonswap(param, ffreq, ttheta, gam);
+        datom = @(param) datom_jonswap(param, ffreq, ttheta, gam);
         cplx = false;
         simu = @(k,SNR) signal(k,SNR,p_range,atom,cplx);
 end
@@ -88,7 +91,7 @@ for i = 1:param_len
 %           range(:,:,1) =[Hmin Tmin ; Hmax Tmax]
 %           range(:,:,2) =[cmin theta0min; cmin theta0min]
     % the JONSWAP frequency spectrum.
-    Sw = alpha.*gwp*fwp;
+    Sw = alpha.*gwp.*fwp;
     
     % the Misuyasu spreading function's normalization constant.
     fun = @(x) (cos((x-theta0i)/2)).^(2*ci);
@@ -98,7 +101,7 @@ for i = 1:param_len
     Gtheta = G0*((cos((theta-theta0i)./2)).^(2*ci));
     
     % the directional wave spectrum
-    Swtheta = Sw*Gtheta;
+    Swtheta = Sw.*Gtheta;
     
     % Add to the dictionary
     atom_dict =[atom_dict, reshape(Swtheta,[],1)];
@@ -221,10 +224,10 @@ function [G] = make_grid(N,p_range)
 %           p_range(:,:,1) =[Hmin Tmin ; Hmax Tmax]
 %           p_range(:,:,2) =[cmin theta0min; cmin theta0min]
 
-gH = p_range(1,1,1):(p_range(1,1,1)-p_range(2,1,1))/(N(1,1)-1):p_range(2,1,1);
-gT = p_range(1,2,1):(p_range(1,2,1)-p_range(2,2,1))/(N(1,2)-1):p_range(2,2,1);
-gc = p_range(1,1,2):(p_range(1,1,2)-p_range(2,1,2))/(N(1,3)-1):p_range(2,1,2);
-gtheta0 = p_range(1,2,2):(p_range(1,2,2)-p_range(2,2,2))/(N(1,4)-1):p_range(2,2,2);
+gH = p_range(1,1,1):(p_range(2,1,1)-p_range(1,1,1))/(N(1,1)-1):p_range(2,1,1);
+gT = p_range(1,2,1):(p_range(2,2,1)-p_range(1,2,1))/(N(1,2)-1):p_range(2,2,1);
+gc = p_range(1,1,2):(p_range(2,1,2)-p_range(1,1,2))/(N(1,3)-1):p_range(2,1,2);
+gtheta0 = p_range(1,2,2):(p_range(2,2,2)-p_range(1,2,2))/(N(1,4)-1):p_range(2,2,2);
 
 [H, T, c, theta0] = ndgrid(gH, gT, gc, gtheta0);
 
