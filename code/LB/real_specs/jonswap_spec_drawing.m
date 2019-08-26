@@ -11,7 +11,7 @@ H = 2;% significant wave height(the average height of the 1/3 highest waves).(10
         % this parameter don't change the shape of the frequency spectrum.
         % increase the energy of the spectrum.
        
-T = 14;% the significant wave period.(14)
+T = 15;% the significant wave period.(14)
         % this parameter don't change the shape of the frequency spectrum.
         % move the spectrum towards the high frequencies.
 

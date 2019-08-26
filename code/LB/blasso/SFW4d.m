@@ -60,6 +60,7 @@ opts_fista.maxIter = 1000;
 opts_fista.tol = 1.e-6;
 opts_fista.disp = false;
 
+
 for iter = 1 : opts.maxIter
     
     % % % % % % % % % % % % %
@@ -73,8 +74,8 @@ for iter = 1 : opts.maxIter
     if(opts.disp)
         disp('--------')
         disp(['Iteration :',int2str(iter)])
-        disp(['Selected parameter x: ',num2str(param_new(1,1)),' y: ',num2str(param_new(2,1))])
-        disp(['Selected parameter sigx2: ',num2str(param_new(3,1)),' sigy2: ',num2str(param_new(4,1))])
+        disp(['x1: ',num2str(param_new(1,1)),' x2: ',num2str(param_new(2,1))])
+        disp(['x3: ',num2str(param_new(3,1)),' x4: ',num2str(param_new(4,1))])
         disp(['Inner product value :',num2str(val_new)])
     end
     
