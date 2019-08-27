@@ -28,9 +28,19 @@ function [ opts ] = jonswap_simu(dico,gam,range, freq, theta)
 switch dico
     case 'jonswap'
         p_range = range;
+        epsilon = 0.2;
         %freq = linspace(0,10,100); % the frequency range
         %theta = linspace(0,2*pi,36); % the theta range
-        [ffreq,ttheta] = meshgrid(freq,theta);
+        min_freq = min(freq);
+        max_freq = max(freq);
+        freq_len = length(freq);
+        theta_len = length(theta);
+        
+        freq_ = (max(0.1,min_freq-epsilon)):(max_freq+epsilon-max(0.1,min_freq-epsilon))/(freq_len-1):(max_freq+epsilon);
+        theta_ = 0:2*pi/(theta_len -1):2*pi;
+        theta_ = mod(-pi/2-theta_,2*pi);
+        [ffreq,ttheta] = meshgrid(freq_,theta_);
+        
         atom = @(param) atom_jonswap(param, ffreq, ttheta, gam);
         datom = @(param) datom_jonswap(param, ffreq, ttheta, gam);
         cplx = false;
@@ -94,7 +104,7 @@ for i = 1:param_len
     Sw = alpha.*gwp.*fwp;
     
     % the Misuyasu spreading function's normalization constant.
-    fun = @(x) (cos((x-theta0i)/2)).^(2*ci);
+    fun = @(x) (cos((mod(-x-pi/2,2*pi)-theta0i)./2)).^(2*ci);
     G0 = 1/(integral(fun,0,2*pi));
     
     % the Misuyasu spreading function
@@ -147,7 +157,7 @@ for i= 1:param_len
     
     kwp = -((w-wp).^2)./(2*(sigma.^2)*(wp^2));
     
-    dkwp_wp =(2./((sigma.^2).*(wp.^3))).*(w.^2 -w.*wp); 
+    dkwp_wp =(1./((sigma.^2).*(wp.^3))).*(w.^2 -w.*wp); 
     
     mwp = exp(kwp);
     
@@ -165,7 +175,7 @@ for i= 1:param_len
     
     dalpha_wp = 4*alpha./wp;
     
-    fun = @(x) (cos((x-theta0i)/2)).^(2*ci);
+    fun = @(x) (cos((mod(-x-pi/2,2*pi)-theta0i)./2)).^(2*ci);
     G0 = 1/(integral(fun,0,2*pi)); % the Misuyasu spreading function's normalization constant.
     
     G_theta = G0*((cos((theta-theta0i)./2)).^(2*ci)); % the Misuyasu spreading function
@@ -228,14 +238,22 @@ function [G] = make_grid(N,p_range)
 %           p_range(:,:,2) =[cmin theta0min; cmin theta0min]
 
 gH = p_range(1,1,1):(p_range(2,1,1)-p_range(1,1,1))/(N(1,1)-1):p_range(2,1,1);
+gH_ = gH(randperm(length(gH)));
 gT = p_range(1,2,1):(p_range(2,2,1)-p_range(1,2,1))/(N(1,2)-1):p_range(2,2,1);
+gT_ = gT(randperm(length(gT)));
 gc = p_range(1,1,2):(p_range(2,1,2)-p_range(1,1,2))/(N(1,3)-1):p_range(2,1,2);
-gtheta = p_range(1,2,2):(p_range(2,2,2)-p_range(1,2,2))/(N(1,4)-1):p_range(2,2,2);
-gtheta0 = mod(-pi/2-gtheta,2*pi);
+gc_ = gc(randperm(length(gc)));
+gtheta0 = p_range(1,2,2):(p_range(2,2,2)-p_range(1,2,2))/(N(1,4)-1):p_range(2,2,2);
+gtheta0_ = gtheta0(randperm(length(gtheta0)));
+%gtheta0 = mod(-pi/2-gtheta,2*pi);
 
-[H, T, c, theta0] = ndgrid(gH, gT, gc, gtheta0);
+[H, T, c, theta0] = ndgrid(gH_, gT_, gc_, gtheta0_);
+H_ = H(randperm(length(H)));
+T_ = T(randperm(length(T)));
+c_ = c(randperm(length(c)));
+theta0_ = theta0(randperm(length(theta0)));
 
-G = [reshape(H,1,[]);reshape(T,1,[]);reshape(c,1,[]);reshape(theta0,1,[])];
+G = [reshape(H_,1,[]);reshape(T_,1,[]);reshape(c_,1,[]);reshape(theta0_,1,[])];
 
 end
 
