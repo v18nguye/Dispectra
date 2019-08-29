@@ -7,11 +7,11 @@ clc
 %% 
 % simulation parameters
 %
-H = 2;% significant wave height(the average height of the 1/3 highest waves).(10)
+H = 10;% significant wave height(the average height of the 1/3 highest waves).(10)
         % this parameter don't change the shape of the frequency spectrum.
         % increase the energy of the spectrum.
        
-T = 15;% the significant wave period.(14)
+T = 14;% the significant wave period.(14)
         % this parameter don't change the shape of the frequency spectrum.
         % move the spectrum towards the high frequencies.
 
@@ -73,8 +73,9 @@ Efth = SPC.efth([1:end,1],:,i1);
 %U = SPC.wnd(1,i1);
 %U = 11;
 
-freq = linspace(0,1.5,100);
+freq = linspace(0,0.8,100);
 theta = linspace(0,2*pi,36);
+%theta = mod(-pi/2-theta,2*pi);
 % creat a mesh grid for the frequency and the theta
 [ffreq,ttheta] = meshgrid(freq,theta);
 
@@ -118,13 +119,14 @@ S_w = (alpha./(w.^5)).*exp(-1.25*((wp./w).^4)).*(gam.^phi);
 %Go = (1/pi)*(2.^(2*s-1)).*(((gamma(s+1)).^2)./gamma(2*s+1));
 
 % the mean wave direction
+%theta0 = mod(-pi/2- pi/3, 2*pi);
 theta0 = pi/3;
 
 fun = @(x) (cos((x- theta0)/2)).^(2*c);
-Go = 1/(integral(fun, 0, 2*pi)); % normalizing parameter
+Go = 1/(integral(fun, -pi, pi)); % normalizing parameter
 
 %thetha0 = (SPC.curdir(1,i1)/180)*pi;
-ttheta = mod(90-ttheta,360);
+%ttheta = mod(90-ttheta,360);
 %s = 2;
 G_theta = Go*((cos((ttheta-theta0)./2)).^(2*c));
 % directional spectrum

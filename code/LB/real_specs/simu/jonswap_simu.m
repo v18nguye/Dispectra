@@ -28,26 +28,29 @@ function [ opts ] = jonswap_simu(dico,gam,range, freq, theta)
 switch dico
     case 'jonswap'
         p_range = range;
-        epsilon = 0.2;
-        %freq = linspace(0,10,100); % the frequency range
-        %theta = linspace(0,2*pi,36); % the theta range
+        epsilon = 0.05;
         min_freq = min(freq);
         max_freq = max(freq);
         freq_len = length(freq);
         theta_len = length(theta);
         
-        freq_ = (max(0.1,min_freq-epsilon)):(max_freq+epsilon-max(0.1,min_freq-epsilon))/(freq_len-1):(max_freq+epsilon);
+        freq_ = (max(epsilon,min_freq-epsilon)):(max_freq+epsilon-max(epsilon,min_freq-epsilon))/(freq_len-1):(max_freq+epsilon);
         theta_ = 0:2*pi/(theta_len -1):2*pi;
-        theta_ = mod(-pi/2-theta_,2*pi);
+        %theta_ = mod(-pi/2-theta_,2*pi);
         [ffreq,ttheta] = meshgrid(freq_,theta_);
+        %[fxx,fyy] = pol2cart(ttheta,ffreq);
         
         atom = @(param) atom_jonswap(param, ffreq, ttheta, gam);
         datom = @(param) datom_jonswap(param, ffreq, ttheta, gam);
+        %atom = @(param) atom_jonswap(param, freq, theta, gam);
+        %datom = @(param) datom_jonswap(param, freq, theta, gam);
         cplx = false;
         simu = @(k,SNR) signal(k,SNR,p_range,atom,cplx);
 end
 
 opts.cplx= cplx;
+%opts.fxx = fxx;
+%opts.fyy = fyy;
 opts.range = p_range;
 opts.atom = atom;
 opts.datom = datom;
@@ -104,8 +107,9 @@ for i = 1:param_len
     Sw = alpha.*gwp.*fwp;
     
     % the Misuyasu spreading function's normalization constant.
-    fun = @(x) (cos((mod(-x-pi/2,2*pi)-theta0i)./2)).^(2*ci);
-    G0 = 1/(integral(fun,0,2*pi));
+    %fun = @(x) (cos((mod(-x-pi/2,2*pi)-theta0i)./2)).^(2*ci);
+    fun = @(x) (cos((x-theta0i)./2)).^(2*ci);
+    G0 = 1/(integral(fun,-pi,pi));
     
     % the Misuyasu spreading function
     Gtheta = G0*((cos((theta-theta0i)./2)).^(2*ci));
@@ -139,7 +143,7 @@ datom_dict = [];
 
 for i= 1:param_len
             
-    hi = param(1,i  ); % the ith significant wave height.
+    hi = param(1,i); % the ith significant wave height.
     
     ti = param(2,i); % the ith significant wave period.
    
@@ -175,8 +179,9 @@ for i= 1:param_len
     
     dalpha_wp = 4*alpha./wp;
     
-    fun = @(x) (cos((mod(-x-pi/2,2*pi)-theta0i)./2)).^(2*ci);
-    G0 = 1/(integral(fun,0,2*pi)); % the Misuyasu spreading function's normalization constant.
+    %fun = @(x) (cos((mod(-x-pi/2,2*pi)-theta0i)./2)).^(2*ci);
+    fun = @(x) (cos((x-theta0i)./2)).^(2*ci);
+    G0 = 1/(integral(fun,-pi,pi)); % the Misuyasu spreading function's normalization constant.
     
     G_theta = G0*((cos((theta-theta0i)./2)).^(2*ci)); % the Misuyasu spreading function
     
@@ -237,21 +242,21 @@ function [G] = make_grid(N,p_range)
 %           p_range(:,:,1) =[Hmin Tmin ; Hmax Tmax]
 %           p_range(:,:,2) =[cmin theta0min; cmin theta0min]
 
-gH = p_range(1,1,1):(p_range(2,1,1)-p_range(1,1,1))/(N(1,1)-1):p_range(2,1,1);
-gH_ = gH(randperm(length(gH)));
-gT = p_range(1,2,1):(p_range(2,2,1)-p_range(1,2,1))/(N(1,2)-1):p_range(2,2,1);
-gT_ = gT(randperm(length(gT)));
-gc = p_range(1,1,2):(p_range(2,1,2)-p_range(1,1,2))/(N(1,3)-1):p_range(2,1,2);
-gc_ = gc(randperm(length(gc)));
-gtheta0 = p_range(1,2,2):(p_range(2,2,2)-p_range(1,2,2))/(N(1,4)-1):p_range(2,2,2);
-gtheta0_ = gtheta0(randperm(length(gtheta0)));
-%gtheta0 = mod(-pi/2-gtheta,2*pi);
+gH_ = p_range(1,1,1):(p_range(2,1,1)-p_range(1,1,1))/(N(1,1)-1):p_range(2,1,1);
+%gH_ = gH(randperm(length(gH)));
+gT_ = p_range(1,2,1):(p_range(2,2,1)-p_range(1,2,1))/(N(1,2)-1):p_range(2,2,1);
+%gT_ = gT(randperm(length(gT)));
+gc_ = p_range(1,1,2):(p_range(2,1,2)-p_range(1,1,2))/(N(1,3)-1):p_range(2,1,2);
+%gc_ = gc(randperm(length(gc)));
+gtheta0_ = p_range(1,2,2):(p_range(2,2,2)-p_range(1,2,2))/(N(1,4)-1):p_range(2,2,2);
+%gtheta0_ = gtheta0(randperm(length(gtheta0_)));
+%gtheta0_ = mod(-pi/2-gtheta0_,2*pi);
 
-[H, T, c, theta0] = ndgrid(gH_, gT_, gc_, gtheta0_);
-H_ = H(randperm(length(H)));
-T_ = T(randperm(length(T)));
-c_ = c(randperm(length(c)));
-theta0_ = theta0(randperm(length(theta0)));
+[H_, T_, c_, theta0_] = ndgrid(gH_, gT_, gc_, gtheta0_);
+%H_ = H_(randperm(length(H_)));
+%T_ = T_(randperm(length(T_)));
+%c_ = c_(randperm(length(c_)));
+%theta0_ = theta0_(randperm(length(theta0_)));
 
 G = [reshape(H_,1,[]);reshape(T_,1,[]);reshape(c_,1,[]);reshape(theta0_,1,[])];
 
@@ -263,8 +268,8 @@ function [param,coeff,y] = signal(k,SNR,p_range,atom,cplx)
 pH = rand(1,k)*(p_range(2,1,1)-p_range(1,1,1))+p_range(1,1,1);
 pT = rand(1,k)*(p_range(2,2,1)-p_range(1,2,1))+p_range(1,2,1);
 pc = rand(1,k)*(p_range(2,1,2)-p_range(1,1,2))+p_range(1,1,2);
-ptheta = rand(1,k)*(p_range(2,2,2)-p_range(1,2,2))+p_range(1,2,2);
-ptheta0 = mod(-pi/2-ptheta,2*pi);
+ptheta0 = rand(1,k)*(p_range(2,2,2)-p_range(1,2,2))+p_range(1,2,2);
+%ptheta0 = mod(-pi/2-ptheta,2*pi);
 
 param = [pH; pT; pc; ptheta0];
 

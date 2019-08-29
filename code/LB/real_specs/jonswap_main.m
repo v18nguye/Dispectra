@@ -2,6 +2,7 @@ clear all
 close all
 clc
 
+rng(1)
 %%
 %load needed paths.
 addpath(genpath('./simu'))
@@ -34,7 +35,7 @@ mask_p3 = ~isnan(IWP.phs3); % ....
 %% select the first spectrum with only one wave system (WS)
 
 % select date with detected wind sea, without swell
-MatTime_WS = IWP.MatTime(~mask_p0 & mask_p1 & ~mask_p2 & ~mask_p3);
+MatTime_WS = IWP.MatTime(mask_p0 & mask_p1 & ~mask_p2 & ~mask_p3);
 
 % select date of first spectrum
 MatTime = MatTime_WS(1);
@@ -62,15 +63,15 @@ Efth = SPC.efth([1:end,1],:,i1);
 % range of each parameter.
     %   range(:,:,1) =[Hmin Tmin ; Hmax Tmax]
     %   range(:,:,2) =[cmin theta0min; cmax theta0max]
-range(:,:,1) = [0 20; 0.5 30];
-range(:,:,2) = [12 0.01*pi; 30 2*pi];
+range(:,:,1) = [0.1 10; 10 30];
+range(:,:,2) = [10 0.01*pi; 30 2*pi];
 
 % the JONSWAP shape's parameter.
 gam = 3.3;
 
 % number of parameter elements.
     % N = [N_H, N_T, N_c, N_theta0]
-N = [5 20 20 18];
+N = [15 15 15 18];
 
 y = reshape(Efth,[],1); % spec observation.
 
@@ -87,7 +88,7 @@ opts.cplx = simu_opts.cplx;
 lambda_lambdaMax = .01;
 lambdaMax = norm(opts.A'*y,inf);
 opts.lambda = lambda_lambdaMax*lambdaMax;
-opts.maxIter = 500;
+opts.maxIter = 100;
 opts.tol = 1.e-5;
 opts.disp = true;
 opts.mergeStep = .01;
@@ -113,7 +114,8 @@ set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')
 annotation('textbox',[0.05 0.20 0.01 0.01],'FitBoxToText','on',...
     'backgroundcolor','w',...
     'string',{...
-    '1 system found :', ...
+    '2 systems found :', ...
+    sprintf('Hs(SW) = %4.1f m ; Dir(WS) =%3d deg',IWP.phs0(i2),IWP.pdir0(i2)), ...
     sprintf('Hs(S1) = %4.1f m ; Dir(S1) =%3d deg',IWP.phs1(i2),IWP.pdir1(i2))})
 
 
@@ -126,26 +128,30 @@ x_SFW_blasso_r = real(x_SFW_blasso);
 v = zeros(length(x_SFW_blasso),4);
 i = zeros(1,4);
 % find the largest coefficient.
-[m1,i1] = max(x_SFW_blasso_r);
+[~,i1] = max(abs(x_SFW_blasso_r));
+m1 = x_SFW_blasso_r(i1);
 % assign the i1th value to the minimum value of the vector
 x_SFW_blasso_r(i1) = min(x_SFW_blasso_r);
 v(i1,1) = m1;
 i(1,1) = i1;
 
 % find the second largest coefficient.
-[m2,i2] = max(x_SFW_blasso_r);
+[~,i2] = max(abs(x_SFW_blasso_r));
+m2 = x_SFW_blasso_r(i2);
 %...
 x_SFW_blasso_r(i2) = min(x_SFW_blasso_r);
 v(i2,2) = m2;
 i(1,2) = i2;
 % find the third largest coefficient.
-[m3,i3] = max(x_SFW_blasso_r);
+[~,i3] = max(abs(x_SFW_blasso_r));
+m3 = x_SFW_blasso_r(i3);
 %...
 x_SFW_blasso_r(i3) = min(x_SFW_blasso_r);
 v(i3,3) = m3;
 i(1,3) = i3;
 % find the fourth largest coefficient.
-[m4,i4] = max(x_SFW_blasso_r);
+[~,i4] = max(abs(x_SFW_blasso_r));
+m4 = x_SFW_blasso_r(i4);
 %...
 x_SFW_blasso_r(i4) = min(x_SFW_blasso_r);
 v(i4,4) = m4;
@@ -157,6 +163,8 @@ for k =1:4
 subplot(2,2,k)
 pcolor(fx,fy,reshape(real(opts.atom(param_SFW_blasso)*v(:,k)),size(Efth)))
 shading flat
+cb = colorbar;
+set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')
 title(['H_T[',num2str(param_SFW_blasso(1,k)),' ',num2str(param_SFW_blasso(2,k)),'] c_theta[',num2str(param_SFW_blasso(3,k)),' ',num2str(param_SFW_blasso(4,k)),'] - a: ', num2str(abs(x_SFW_blasso(i(1,k),1)))]); 
 end
 
