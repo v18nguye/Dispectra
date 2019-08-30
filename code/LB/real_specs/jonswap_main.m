@@ -85,13 +85,13 @@ opts.atom = simu_opts.atom;
 opts.datom = simu_opts.datom;
 opts.B = simu_opts.range;
 opts.cplx = simu_opts.cplx;
-lambda_lambdaMax = .01;
+lambda_lambdaMax = .5;
 lambdaMax = norm(opts.A'*y,inf);
 opts.lambda = lambda_lambdaMax*lambdaMax;
 opts.maxIter = 100;
 opts.tol = 1.e-5;
 opts.disp = true;
-opts.mergeStep = .1; %0.01
+opts.mergeStep = .3; %0.01
 
 % resolve the system.
 tic

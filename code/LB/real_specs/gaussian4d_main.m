@@ -74,7 +74,7 @@ opts.datom = simu_opts.datom;
 opts.B = simu_opts.p_range;
 opts.cplx = simu_opts.cplx;
 
-lambda_lambdaMax = .01;
+lambda_lambdaMax = .5;
 lambdaMax = norm(opts.A'*y,inf);
 
 opts.lambda = lambda_lambdaMax*lambdaMax;
@@ -82,7 +82,7 @@ opts.maxIter = 200;
 opts.tol = 1.e-5;
 opts.disp = true;
 tic
-opts.mergeStep = .01;
+opts.mergeStep = .1;
 [param_SFW_blasso, x_SFW_blasso , fc_SFW_blasso , fc_SFW_lasso , fc_SFW_lassodual ] = SFW4d( y , opts );
 toc
 y_blasso = opts.atom(param_SFW_blasso)*x_SFW_blasso;

@@ -66,7 +66,7 @@ for iter = 1 : opts.maxIter
     % % % % % % % % % % % % %
     % Atom selection step % %
     % % % % % % % % % % % % %
-    % add a supplement theta
+    % add a supplementary theta.
     [ out_atom_selection ] = atom_selection_4d( residual , opts );
     param_new = out_atom_selection.param_new;
     val_new = out_atom_selection.val;
@@ -202,14 +202,40 @@ end
 
 function [ param , coeff , t ] = Joint_updt( y , param , coeff , lambda , B , atom , datom , cplx )
 
-n = length(param(1,:));
+% the function's arguments:
+%
+% - param = shape(4,k)
+%       + 4: four parameters x1, x2, x3, x4. Each row corresponds to a
+%       range of the parameter's values.
+%       + k: a number of combinations of the parameters arranged in a column.
+%
+%               " A*coeff = y "
+% - coeff = shape(k,1)
+%       + k: a number of combinations of the parameters arranged in a
+%       column.
+%
+% - lamda = shape(1,1)
+%       + min || y - [atom(theta_1)*coeff_1 + ... atom(theta_i)*coeff_i + ... atom(theta_k)*coeff_k] ||^2 + lamda*coeff_i + ...
+%            where i = 1 ... k
+
+n = length(param(1,:)); % the number of parameters's combinations.
+
+% - vi = shape(3*k,1) = [vi_1 vi_2 .. vi_k abs(coeff_vi_1) abs(coeff_vi_2) ..
+% abs(coeff_vi_k) angle(coeff_vi_1) angle(coeff_vi_2) ..
+% angle(coeff_vk_k)].T
+%
+% where:
+%   + k is the number of parameters's combinations
+%   + i is the ith variables i = {1,2,3,4}
 
 v1 = [param(1,:)';abs(coeff);angle(coeff)]; % for the first parameter.
 v2 = [param(2,:)';abs(coeff);angle(coeff)]; % ...
 v3 = [param(3,:)';abs(coeff);angle(coeff)];
 v4 = [param(4,:)';abs(coeff);angle(coeff)];
 
-v = [v1 v2 v3 v4];
+% v = shape(3*k,4)
+%
+v = [v1 v2 v3 v4]; % Concatenation each column vi
 
 
 A1 = [ -eye(n) , zeros(n,2*n), zeros(n,9*n) ;... % for the first parameter.
