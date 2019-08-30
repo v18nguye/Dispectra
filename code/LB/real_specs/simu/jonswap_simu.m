@@ -161,7 +161,8 @@ for i= 1:param_len
     
     kwp = -((w-wp).^2)./(2*(sigma.^2)*(wp^2));
     
-    dkwp_wp =(1./((sigma.^2).*(wp.^3))).*(w.^2 -w.*wp); 
+    %dkwp_wp =(1./((sigma.^2).*(wp.^3))).*(w.^2 -w.*wp); 
+    dkwp_wp =(1./((sigma.^3).*(wp.^3))).*(sigma.*w +0.02*(w-wp)); 
     
     mwp = exp(kwp);
     
