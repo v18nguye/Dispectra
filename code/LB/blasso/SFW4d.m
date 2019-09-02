@@ -220,12 +220,12 @@ function [ param , coeff , t ] = Joint_updt( y , param , coeff , lambda , B , at
 
 n = length(param(1,:)); % the number of parameters's combinations.
 
-% - vi = shape(3*k,1) = [vi_1 vi_2 .. vi_k abs(coeff_vi_1) abs(coeff_vi_2) ..
-% abs(coeff_vi_k) angle(coeff_vi_1) angle(coeff_vi_2) ..
-% angle(coeff_vk_k)].T
+% - vi = shape(3*n,1) = [vi_1 vi_2 .. vi_n abs(coeff_vi_1) abs(coeff_vi_2) ..
+% abs(coeff_vi_n) angle(coeff_vi_1) angle(coeff_vi_2) ..
+% angle(coeff_vi_n)].T
 %
 % where:
-%   + k is the number of parameters's combinations
+%   + n is the number of parameters's combinations
 %   + i is the ith variables i = {1,2,3,4}
 
 v1 = [param(1,:)';abs(coeff);angle(coeff)]; % for the first parameter.
@@ -233,10 +233,22 @@ v2 = [param(2,:)';abs(coeff);angle(coeff)]; % ...
 v3 = [param(3,:)';abs(coeff);angle(coeff)];
 v4 = [param(4,:)';abs(coeff);angle(coeff)];
 
-% v = shape(3*k,4)
+% v = shape(3*n,4)
 %
 v = [v1 v2 v3 v4]; % Concatenation each column vi
 
+%
+%     |
+%     |
+%     |
+%     |
+% A1 =|
+%
+%
+%
+%
+%
+%
 
 A1 = [ -eye(n) , zeros(n,2*n), zeros(n,9*n) ;... % for the first parameter.
     eye(n) , zeros(n,2*n), zeros(n,9*n) ;...
