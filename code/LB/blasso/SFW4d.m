@@ -204,19 +204,21 @@ function [ param , coeff , t ] = Joint_updt( y , param , coeff , lambda , B , at
 
 % the function's arguments:
 %
-% - param = shape(4,k)
+% - an atom's param = shape(4,1).
+%
+% - param = shape(4,n)
 %       + 4: four parameters x1, x2, x3, x4. Each row corresponds to a
 %       range of the parameter's values.
-%       + k: a number of combinations of the parameters arranged in a column.
+%       + n: a number of combinations of the parameters arranged in a column.
 %
 %               " A*coeff = y "
-% - coeff = shape(k,1)
-%       + k: a number of combinations of the parameters arranged in a
+% - coeff = shape(n,1)
+%       + n: a number of combinations of the parameters arranged in a
 %       column.
 %
 % - lamda = shape(1,1)
 %       + min || y - [atom(theta_1)*coeff_1 + ... atom(theta_i)*coeff_i + ... atom(theta_k)*coeff_k] ||^2 + lamda*coeff_i + ...
-%            where i = 1 ... k
+%            where i = 1 ... n
 
 n = length(param(1,:)); % the number of parameters's combinations.
 
@@ -233,48 +235,70 @@ v2 = [param(2,:)';abs(coeff);angle(coeff)]; % ...
 v3 = [param(3,:)';abs(coeff);angle(coeff)];
 v4 = [param(4,:)';abs(coeff);angle(coeff)];
 
-% v = shape(3*n,4)
+% v = shape(3*n,4) is a generalized case of the SFW method for one prameter.
+% by concatenating each column vi corresponding to each of variable.
+%        _                                                                   _
+%       |v1_1                 v2_1                  ...    v4_1               |
+%       |v1_2                 v2_2                  ...    v4_2               |
+%       | ...                  ...                  ...     ...               |
+%       |v1_n                 v2_n                  ...    v4_n               |
+%       |abs(coeff_atom_1)    abs(coeff_atom_1)     ...    abs(coeff_atom_1)  |
+%       |abs(coeff_atom_2)    abs(coeff_atom_2)     ...    abs(coeff_atom_2)  |
+%   v = | ...                  ...                  ...     ...               |
+%       |abs(coeff_atom_n)    abs(coeff_atom_n)     ...    abs(coeff_atom_n)  |
+%       |angle(coeff_atom_1)  angle(coeff_atom_1)   ...    angle(coeff_atom_1)|
+%       |angle(coeff_atom_2)  angle(coeff_atom_2)   ...    angle(coeff_atom_2)|
+%       | ...                   ...                 ...     ...               |
+%       |angle(coeff_atom_n)  angle(coeff_atom_n)   ...    angle(coeff_atom_n)|
 %
-v = [v1 v2 v3 v4]; % Concatenation each column vi
+% where sum( atom(vi_)*coeff_atom_i ) = y
+v = [v1 v2 v3 v4]; 
 
+% Solve the optimization problem of the "joint_cost" function. We use the
+% same method as the SFW for one parameter. Here we generalize the case for
+% four parameters in the constrained regions.
+%     
+%   v1_1, v1_2, ..., v1_n <= lower_limit_range_v1.
+%   v1_1, v1_2, ..., v1_n >= upper_limit_range_v1.
 %
-%     |
-%     |
-%     |
-%     |
-% A1 =|
+%   Similar limit range conditions for: v2, v3, v4.
 %
+%   abs(coeff_atom_1), abs(coeff_atom_2), ..., abs(coeff_atom_n) >= 0.
+%   no constraints for: angle(coeff_atom_1), angle(coeff_atom_2), ..., angle(coeff_atom_n).
 %
+% To form these region constrains we form the matrix below for the
+% "fmincon" function. And use the "Sequential Quadratic Proramming" for
+% constrained nonlinear optimization.
 %
+% The below matrix form are correctly verfified by using an example with n =2. 
 %
-%
-%
-
 A1 = [ -eye(n) , zeros(n,2*n), zeros(n,9*n) ;... % for the first parameter.
     eye(n) , zeros(n,2*n), zeros(n,9*n) ;...
     zeros(n) , -eye(n) , zeros(n,n), zeros(n, 9*n)];
 b1 = [ -ones(n,1)*B(1,1,1) ; ones(n,1)*B(2,1,1) ; zeros(n,1) ];
 
-A2 = [ zeros(n,3*n),-eye(n) , zeros(n,2*n),zeros(n,6*n)  ;... % ...
+A2 = [ zeros(n,3*n),-eye(n) , zeros(n,2*n),zeros(n,6*n)  ;... % for the second parameter.
     zeros(n,3*n), eye(n) , zeros(n,2*n), zeros(n,6*n);...
     zeros(n,3*n), zeros(n) , -eye(n) , zeros(n,n), zeros(n,6*n)];
 b2 = [ -ones(n,1)*B(1,2,1) ; ones(n,1)*B(2,2,1) ; zeros(n,1) ];
 
-A3 = [ zeros(n,6*n),-eye(n) , zeros(n,2*n),zeros(n,3*n)  ;...
+A3 = [ zeros(n,6*n),-eye(n) , zeros(n,2*n),zeros(n,3*n)  ;... % ...
     zeros(n,6*n), eye(n) , zeros(n,2*n), zeros(n,3*n);...
     zeros(n,6*n), zeros(n) , -eye(n) , zeros(n,n), zeros(n,3*n)];
 b3 = [ -ones(n,1)*B(1,1,2) ; ones(n,1)*B(2,1,2) ; zeros(n,1) ];
 
-A4 = [ zeros(n,9*n) ,-eye(n) , zeros(n,2*n);...
+A4 = [ zeros(n,9*n) ,-eye(n) , zeros(n,2*n);... % for the fourth parameter.
      zeros(n,9*n),eye(n) , zeros(n,2*n);...
     zeros(n,9*n) , zeros(n) , -eye(n) , zeros(n,n)];
 b4 = [ -ones(n,1)*B(1,2,2) ; ones(n,1)*B(2,2,2) ; zeros(n,1) ];
 
-
-A = [A1; A2; A3; A4];
-
+% Constrained regions for the 4 parameters.
+%               A*v <= b 
+A = [A1; A2; A3; A4]; 
 b = [b1; b2; b3; b4];
 
+% Find v = [v1, v2, v3, v4] to optimize the "joint_cost" function. Start at
+% the initial value v0.
 fobj = @(v0) joint_cost( y , v0 , lambda , atom , datom , cplx );
 options = optimoptions(@fmincon,'Display','off','GradObj','on','DerivativeCheck','off','Algorithm','sqp');
 [ v ] = fmincon(fobj,v,A,b,[],[],[],[],[],options);
@@ -292,20 +316,66 @@ end
 
 function [fc,grad] = joint_cost( y , v , lambda , atom , datom , cplx )
 
-l = size(v);
-l = l(1)/3;
+% v = shape(3*n,4) is a generalized case of the SFW method for one prameter.
+% by concatenating each column vi corresponding to each of variable.
+%        _                                                                   _
+%       |v1_1                 v2_1                  ...    v4_1               |
+%       |v1_2                 v2_2                  ...    v4_2               |
+%       | ...                  ...                  ...     ...               |
+%       |v1_n                 v2_n                  ...    v4_n               |
+%       |abs(coeff_atom_1)    abs(coeff_atom_1)     ...    abs(coeff_atom_1)  |
+%       |abs(coeff_atom_2)    abs(coeff_atom_2)     ...    abs(coeff_atom_2)  |
+%   v = | ...                  ...                  ...     ...               |
+%       |abs(coeff_atom_n)    abs(coeff_atom_n)     ...    abs(coeff_atom_n)  |
+%       |angle(coeff_atom_1)  angle(coeff_atom_1)   ...    angle(coeff_atom_1)|
+%       |angle(coeff_atom_2)  angle(coeff_atom_2)   ...    angle(coeff_atom_2)|
+%       | ...                   ...                 ...     ...               |
+%       |angle(coeff_atom_n)  angle(coeff_atom_n)   ...    angle(coeff_atom_n)|
+%
+% where sum( atom(vi_)*coeff_atom_i ) = y
 
+l = size(v); % return the shape of the v vector, shape(v) = (3*n,4).
+l = l(1)/3;  % l(1) = 3*n => l = l(1)/3 = n corresponding to the number of the atom's params.
+         
+%        |v1_1  v1_2  ...  v1_n|
+%        |v2_1  v2_2  ...  v2_n|
+% theta =|v3_1  v3_2  ...  v3_n|
+%        |v4_1  v4_2  ...  v4_n|
+% 
+%   where:
+%        v1_, v2_, v3_, v4_ correspond to the four parameters
+%        n is the number of atom's params.
 theta = (v(1:l,:))';
+
+%        |abs(coeff_atom_1)|
+%        |abs(coeff_atom_2)|
+% alpha =|    ...          |
+%        |abs(coeff_atom_n)|
+%
+% where sum( atom(vi_)*coeff_atom_i ) = y
 alpha = v(l+1:2*l,1);
+
+%        |angle(coeff_atom_1)|
+%        |angle(coeff_atom_2)|
+% gamma =|  ...              |
+%        |angle(coeff_atom_n)|
+%
+% where sum( atom(vi_)*coeff_atom_i ) = y
 gamma = v(2*l+1:3*l,1);
 
-coeff = alpha.*exp(1i*gamma);
+coeff = alpha.*exp(1i*gamma); % shape(coeff) = (n,1)
 
-A = atom(theta);
-dA = datom(theta);
-res = y-A*coeff;
+A = atom(theta); % shape(A) = (?,n)
+
+%   dA = [datom(atom_1)/dv1, datom(atom_1)/dv2, datom(atom_1)/dv3,
+%   datom(atom_1)/dv4 ... datom(atom_n)/dv1 ... datom(atom_n)/dv4]
+dA = datom(theta); % shape(dA) =(?,4*n)
+
+res = y-A*coeff; % shape(res) = (?,1)
 fc = .5*norm(res,2)^2+lambda*norm(alpha,1);
 
+% coeff_4d = [coeff_atom1 coeff_atom1 coeff_atom1 coeff_atom1 ... coeff_atom4 coeff_atom4 coeff_atom4 coeff_atom4]
+% shape(coeff_4d) = (1,4*n)
 coeff_4d = [];
 
 for i = 1: length(coeff)
@@ -313,16 +383,41 @@ for i = 1: length(coeff)
     coeff_4d = [coeff_4d coeff(i,1)*ones(1,4)];
     
 end
-
+%
+% grad_theta(atom_k)/dvi = -real(res'*coeff_atom_k*(datom(atom_k)/dvi))
+%
+%   where:
+%       shape(res) = (?,1)
+%       shape(datom(atom_k)/dvi) = (?;1)
+%       k = { 1, 2, ..., n}
+%       i = { 1, 2, ..., 4}
+%
+% 
+% grad_theta = [grad_theta(atom_1)/dv1 grad_theta(atom_1)/dv2 grad_theta(atom_1)/dv3 grad_theta(atom_1)/dv4, ...
+%              grad_theta(atom_2)/dv1 grad_theta(atom_2)/dv2 grad_theta(atom_2)/dv3 grad_theta(atom_2)/dv4, ...
+%                                               ....
+%              grad_theta(atom_n)/dv1 grad_theta(atom_n)/dv2 grad_theta(atom_n)/dv3 grad_theta(atom_n)/dv4]
+%
+% shape(grad_theta) = (1,4*n)
 grad_theta = -real(res'*dA*diag(coeff_4d));
+
+% shape(grad_alpha) = (n,1)
 grad_alpha = -(real(res'*A*diag(exp(1i*gamma)))).'+lambda;
 
+% shape(grad_gama) = (n,1)
 if(cplx)
     grad_gamma = imag(res'*A*diag(coeff)).';
 else
     grad_gamma = zeros(l,1);
 end
 
+%
+% grad.T = [grad_theta(atom_1)/dv1, grad_theta(atom_2)/dv1 ... grad_theta(atom_n)/dv1, grad_alpha', grad_gamma'
+%       grad_theta(atom_1)/dv2, grad_theta(atom_2)/dv2 ... grad_theta(atom_n)/dv2,  grad_alpha', grad_gamma'
+%       grad_theta(atom_1)/dv3, grad_theta(atom_2)/dv3 ... grad_theta(atom_n)/dv3,  grad_alpha', grad_gamma'
+%       grad_theta(atom_1)/dv4, grad_theta(atom_2)/dv4 ... grad_theta(atom_n)/dv4,  grad_alpha', grad_gamma']
+%
+% shape(grad) = (3n*4,1)
 grad = [grad_theta(1:4:length(grad_theta))';grad_alpha;grad_gamma;...
     grad_theta(2:4:length(grad_theta))';grad_alpha;grad_gamma;...
     grad_theta(3:4:length(grad_theta))';grad_alpha;grad_gamma;...
@@ -371,6 +466,11 @@ while true
         
         % atom selection
         fObj = @(param) min_scal_prod(residual,param,atom,datom);
+        %
+        % Constrained regions:
+        %   param_new = [param_new_1 param_new_2 param_new_3 param_new_4].T
+        %       lower_limit_i <= param_new_i <= upper_limit_i with i= {1,2,3,4}
+        % To form these conditions, we form:
         A = [ -1  0 0 0;1 0 0 0 ; 0 -1 0 0;0 1 0 0;0 0 -1 0; 0 0 1 0; 0 0 0 -1; 0 0 0 1];
         b = [-B(1,1,1); B(2,1,1) ;-B(1,2,1); B(2,2,1); -B(1,1,2); B(2,1,2) ;-B(1,2,2); B(2,2,2)];
         options = optimoptions(@fmincon,'Display','off','GradObj','on','Algorithm','sqp');

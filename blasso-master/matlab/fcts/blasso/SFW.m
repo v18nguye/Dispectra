@@ -193,8 +193,32 @@ end
 
 function [ param , coeff , t ] = Joint_updt( y , param , coeff , lambda , B , atom , datom , cplx )
 
-n = length(param);
-X = [param(:);abs(coeff);angle(coeff)];
+n = length(param); % the number of the atom's params.
+%
+% X = shape(3*n,1)=[ x1, x2,..., xn,
+%                   abs(coeff_x1), abs(coeff_x2), ..., abs(coeff_xn),
+%                   angle(coeff_x1), angle(coeff_x2), ..., angle(coeff_xn)].T
+%
+% where: 
+%       n -- the number of the atom's param.
+%
+X = [param(:);abs(coeff);angle(coeff)]; 
+
+% Solve the optimization problem of the "joint_cost" function in the
+% constrained region AX <=b.
+%
+% The constrained region explication:
+%       x1, x2,... xn >= B(1) 
+%       x1, x2, ... xn <= B(2)
+%       abs(coeff_x1), abs(coeff_x2), ... abs(coeff_xn) >= 0
+%       no constraints for angle(coeff_x1), angle(coeff_x2), ...
+%       angle(coeff_xn).
+%
+%   where:
+%       n -- the number of the atom's params.
+%
+% To satisfy the above condition of the constrained region, we form the
+% below matrix:
 
 A = [ -eye(n) , zeros(n,2*n) ;...
     eye(n) , zeros(n,2*n) ;...
@@ -218,16 +242,16 @@ end
 
 function [fc,grad] = joint_cost( y , X , lambda , atom , datom , cplx )
 
-l = (length(X))/3;
+l = (length(X))/3; % the number of atoms.
 
-theta = (X(1:l))';
-alpha = X(l+1:2*l);
+theta = (X(1:l))'; % atom's params, shape(theta) =(n,1)
+alpha = X(l+1:2*l); % 
 gamma = X(2*l+1:3*l);
 
 coeff = alpha.*exp(1i*gamma);
 
-A = atom(theta);
-dA = datom(theta);
+A = atom(theta); % shape(A) = (?,n)
+dA = datom(theta); % shape(dA) = (?,n)
 res = y-A*coeff;
 fc = .5*norm(res,2)^2+lambda*norm(alpha,1);
 

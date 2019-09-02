@@ -5,10 +5,13 @@ clc
 %%
 %load needed paths.
 addpath(genpath('./simu'))
-addpath(genpath('/homes/v18nguye/Documents/intern2019/data/WW3'))
-addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/blasso'))
-addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/lasso'))
+%addpath(genpath('/homes/v18nguye/Documents/intern2019/data/WW3'))
+%addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/blasso'))
+%addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/lasso'))
 
+addpath(genpath('E:/IMT/intern2019/data/WW3'))
+addpath(genpath('E:/IMT/intern2019/code/LB/blasso'))
+addpath(genpath('E:/IMT/intern2019/code/LB/lasso'))
 %%
 % spec file parameters
 str_date = '201001';
