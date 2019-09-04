@@ -6,12 +6,12 @@ rng(1)
 %%
 %load needed paths.
 addpath(genpath('./simu'))
-%addpath(genpath('/homes/v18nguye/Documents/intern2019/data/WW3'))
-%addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/blasso'))
-%addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/lasso'))
+addpath(genpath('/homes/v18nguye/Documents/intern2019/data/WW3'))
+addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/blasso'))
+addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/lasso'))
 
 addpath(genpath('E:/IMT/intern2019/data/WW3'))
-addpath(genpath('E:/IMT/intern2019/code/LB/blasso'))
+addpath(genpath('E:/IMT/intern2019/code/LB/bla  sso'))
 addpath(genpath('E:/IMT/intern2019/code/LB/lasso'))
 %%
 % spec file parameters
@@ -79,22 +79,22 @@ N = [15 15 15 18];
 y = reshape(Efth,[],1); % spec observation.
 
 % simulate.
-simu_opts = jonswap_simu('jonswap', gam, range, freq, theta);
+s = jonswap_simu('jonswap', gam, range, freq, theta);
 
 % swf method simulation parameters.
-opts.param_grid = simu_opts.test_grid(N); % create a parameter grid
-opts.A = simu_opts.atom(opts.param_grid);
-opts.atom = simu_opts.atom;
-opts.datom = simu_opts.datom;
-opts.B = simu_opts.range;
-opts.cplx = simu_opts.cplx;
-lambda_lambdaMax = .5;
+opts.param_grid = s.test_grid(N); % create a parameter grid
+opts.A = s.atom(opts.param_grid);
+opts.atom = s.atom;
+opts.datom = s.datom;
+opts.B = s.range;
+opts.cplx = s.cplx;
+lambda_lambdaMax = .01;
 lambdaMax = norm(opts.A'*y,inf);
 opts.lambda = lambda_lambdaMax*lambdaMax;
 opts.maxIter = 100;
 opts.tol = 1.e-5;
 opts.disp = true;
-opts.mergeStep = .3; %0.01
+opts.mergeStep = 0.05; %0.01
 
 % resolve the system.
 tic
@@ -129,36 +129,36 @@ annotation('textbox',[0.05 0.20 0.01 0.01],'FitBoxToText','on',...
 % all of them.
 %
 
-x_SFW_blasso_r = real(x_SFW_blasso);
+x_SFW_blasso_abs = abs(x_SFW_blasso);
 v = zeros(length(x_SFW_blasso),4);
 i = zeros(1,4);
 % find the largest coefficient.
-[~,i1] = max(x_SFW_blasso_r);
-m1 = x_SFW_blasso_r(i1);
+[~,i1] = max(x_SFW_blasso_abs);
+m1 = x_SFW_blasso(i1,1);
 % assign the i1th value to the minimum value of the vector
-x_SFW_blasso_r(i1) = min(x_SFW_blasso_r);
+x_SFW_blasso_abs(i1) = min(x_SFW_blasso_abs);
 v(i1,1) = m1;
 i(1,1) = i1;
 
 % find the second largest coefficient.
-[~,i2] = max(x_SFW_blasso_r);
-m2 = x_SFW_blasso_r(i2);
+[~,i2] = max(x_SFW_blasso_abs);
+m2 = x_SFW_blasso(i2,1);
 %...
-x_SFW_blasso_r(i2) = min(x_SFW_blasso_r);
+x_SFW_blasso_abs(i2) = min(x_SFW_blasso_abs);
 v(i2,2) = m2;
 i(1,2) = i2;
 % find the third largest coefficient.
-[~,i3] = max(x_SFW_blasso_r);
-m3 = x_SFW_blasso_r(i3);
+[~,i3] = max(x_SFW_blasso_abs);
+m3 = x_SFW_blasso(i3,1);
 %...
-x_SFW_blasso_r(i3) = min(x_SFW_blasso_r);
+x_SFW_blasso_abs(i3) = min(x_SFW_blasso_abs);
 v(i3,3) = m3;
 i(1,3) = i3;
 % find the fourth largest coefficient.
-[~,i4] = max(x_SFW_blasso_r);
-m4 = x_SFW_blasso_r(i4);
+[~,i4] = max(x_SFW_blasso_abs);
+m4 = x_SFW_blasso(i4,1);
 %...
-x_SFW_blasso_r(i4) = min(x_SFW_blasso_r);
+x_SFW_blasso_abs(i4) = min(x_SFW_blasso_abs);
 v(i4,4) = m4;
 i(1,4) = i4;
 
@@ -166,7 +166,7 @@ i(1,4) = i4;
 figure('Name',sprintf('Spectrum Elements'))
 for k =1:4
 subplot(2,2,k)
-pcolor(fx,fy,reshape(real(opts.atom(param_SFW_blasso)*v(:,k)),size(Efth)))
+pcolor(fx,fy,reshape(abs(opts.atom(param_SFW_blasso)*v(:,k)),size(Efth)))
 shading flat
 cb = colorbar;
 set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')
@@ -175,7 +175,7 @@ end
 
 % plot the sum of four specs
 figure('Name',sprintf('Spectrum recovered by the SFW method'))
-pcolor(fx,fy,reshape(real(y1_reconstruct),size(Efth)))
+pcolor(s.fx,s.fy,reshape(real(y1_reconstruct),size(Efth)))
 shading flat
 cb = colorbar;
 set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')
@@ -186,7 +186,7 @@ y2_reconstruct =0;
 for k = 1:4
     y2_reconstruct = y2_reconstruct + opts.atom(param_SFW_blasso)*v(:,k);
 end
-pcolor(fx,fy,reshape(real(y2_reconstruct),size(Efth)))
+pcolor(s.fx,s.fy,reshape(real(y2_reconstruct),size(Efth)))
 shading flat
 cb = colorbar;
 set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')

@@ -75,6 +75,9 @@ Efth = SPC.efth([1:end,1],:,i1);
 
 freq = linspace(0,0.8,100);
 theta = linspace(0,2*pi,36);
+theta_mask = theta/(pi/2) > 1;
+
+theta = theta_mask*2*pi + pi/2 -theta;
 %theta = mod(-pi/2-theta,2*pi);
 % creat a mesh grid for the frequency and the theta
 [ffreq,ttheta] = meshgrid(freq,theta);
@@ -120,7 +123,8 @@ S_w = (alpha./(w.^5)).*exp(-1.25*((wp./w).^4)).*(gam.^phi);
 
 % the mean wave direction
 %theta0 = mod(-pi/2- pi/3, 2*pi);
-theta0 = pi/3;
+theta0 = 3*pi/2;
+theta0 = ((theta0/(pi/2)) >1)*2*pi +pi/2 -theta0;
 
 fun = @(x) (cos((x- theta0)/2)).^(2*c);
 Go = 1/(integral(fun, -pi, pi)); % normalizing parameter

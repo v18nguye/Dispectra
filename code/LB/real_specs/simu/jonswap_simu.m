@@ -37,8 +37,10 @@ switch dico
         freq_ = (max(epsilon,min_freq-epsilon)):(max_freq+epsilon-max(epsilon,min_freq-epsilon))/(freq_len-1):(max_freq+epsilon);
         theta_ = 0:2*pi/(theta_len -1):2*pi;
         %theta_ = mod(-pi/2-theta_,2*pi);
+        theta_mask = (theta_/(pi/2)) > 1;
+        theta_ = theta_mask*2*pi + pi/2 - theta_;
         [ffreq,ttheta] = meshgrid(freq_,theta_);
-        %[fxx,fyy] = pol2cart(ttheta,ffreq);
+        [fxx,fyy] = pol2cart(ttheta,ffreq);
         
         atom = @(param) atom_jonswap(param, ffreq, ttheta, gam);
         datom = @(param) datom_jonswap(param, ffreq, ttheta, gam);
@@ -49,8 +51,8 @@ switch dico
 end
 
 opts.cplx= cplx;
-%opts.fxx = fxx;
-%opts.fyy = fyy;
+opts.fx = fxx;
+opts.fy = fyy;
 opts.range = p_range;
 opts.atom = atom;
 opts.datom = datom;
@@ -85,6 +87,9 @@ for i = 1:param_len
 
     theta0i = param(4,i);  %the ith mean wave direction.
     
+    theta0_mask = (theta0i/(pi/2)) > 1;
+    theta0i = theta0_mask*2*pi + pi/2 - theta0i;
+    
     betaj = 0.06238*(1.094-0.01915*log(gam))/(0.23+0.0336*gam-0.185*((1.9+gam)^-1));
     
     wp =2*pi*(1-0.132*((gam+0.2)^-0.559))/ti;     % the peak frequency.
@@ -108,8 +113,8 @@ for i = 1:param_len
     
     % the Misuyasu spreading function's normalization constant.
     %fun = @(x) (cos((mod(-x-pi/2,2*pi)-theta0i)./2)).^(2*ci);
-    fun = @(x) (cos((x-theta0i)./2)).^(2*ci);
-    G0 = 1/(integral(fun,-pi,pi));
+    fun = @(x) (cos((((x/(pi/2))>1)*2*pi+(pi/2)-x-theta0i)./2)).^(2*ci);
+    G0 = 1/(integral(fun,0,2*pi));
     
     % the Misuyasu spreading function
     Gtheta = G0*((cos((theta-theta0i)./2)).^(2*ci));
@@ -151,6 +156,9 @@ for i= 1:param_len
 
     theta0i = param(4,i);  %the ith mean wave direction.
     
+    theta0_mask = (theta0i/(pi/2)) > 1;
+    theta0i = theta0_mask*2*pi + pi/2 - theta0i;
+    
     betaj = 0.06238*(1.094-0.01915*log(gam))/(0.23+0.0336*gam-0.185*((1.9+gam)^-1));
     
     wp =2*pi*(1-0.132*((gam+0.2)^-0.559))/ti;     % the peak frequency.
@@ -180,9 +188,8 @@ for i= 1:param_len
     
     dalpha_wp = 4*alpha./wp;
     
-    %fun = @(x) (cos((mod(-x-pi/2,2*pi)-theta0i)./2)).^(2*ci);
-    fun = @(x) (cos((x-theta0i)./2)).^(2*ci);
-    G0 = 1/(integral(fun,-pi,pi)); % the Misuyasu spreading function's normalization constant.
+    fun = @(x) (cos((((x/(pi/2))>1)*2*pi+(pi/2)-x-theta0i)./2)).^(2*ci);
+    G0 = 1/(integral(fun,0,2*pi));
     
     G_theta = G0*((cos((theta-theta0i)./2)).^(2*ci)); % the Misuyasu spreading function
     
@@ -244,20 +251,13 @@ function [G] = make_grid(N,p_range)
 %           p_range(:,:,2) =[cmin theta0min; cmin theta0min]
 
 gH_ = p_range(1,1,1):(p_range(2,1,1)-p_range(1,1,1))/(N(1,1)-1):p_range(2,1,1);
-%gH_ = gH(randperm(length(gH)));
 gT_ = p_range(1,2,1):(p_range(2,2,1)-p_range(1,2,1))/(N(1,2)-1):p_range(2,2,1);
-%gT_ = gT(randperm(length(gT)));
 gc_ = p_range(1,1,2):(p_range(2,1,2)-p_range(1,1,2))/(N(1,3)-1):p_range(2,1,2);
-%gc_ = gc(randperm(length(gc)));
 gtheta0_ = p_range(1,2,2):(p_range(2,2,2)-p_range(1,2,2))/(N(1,4)-1):p_range(2,2,2);
-%gtheta0_ = gtheta0(randperm(length(gtheta0_)));
-%gtheta0_ = mod(-pi/2-gtheta0_,2*pi);
+%theta0_mask = (gtheta0_/(pi/2)) > 1;
+%gtheta0_ = theta0_mask*2*pi + pi/2 - gtheta0_;
 
 [H_, T_, c_, theta0_] = ndgrid(gH_, gT_, gc_, gtheta0_);
-%H_ = H_(randperm(length(H_)));
-%T_ = T_(randperm(length(T_)));
-%c_ = c_(randperm(length(c_)));
-%theta0_ = theta0_(randperm(length(theta0_)));
 
 G = [reshape(H_,1,[]);reshape(T_,1,[]);reshape(c_,1,[]);reshape(theta0_,1,[])];
 

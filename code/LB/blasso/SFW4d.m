@@ -56,9 +56,9 @@ fc_lasso = zeros(1,opts.maxIter);
 fc_lassoDual = zeros(1,opts.maxIter);
 
 opts_fista.lambda = opts.lambda;
-opts_fista.maxIter = 1000;
+opts_fista.maxIter = 5000;
 opts_fista.tol = 1.e-6;
-opts_fista.disp = false;
+opts_fista.disp = true;
 
 
 for iter = 1 : opts.maxIter
@@ -305,7 +305,7 @@ options = optimoptions(@fmincon,'Display','off','GradObj','on','DerivativeCheck'
 
 param = v(1:n,:)';
 if(cplx)
-    coeff = v(n+1:2*n,:).*exp(1i*v(2*n+1:3*n,:));
+    coeff = v(n+1:2*n,1).*exp(1i*v(2*n+1:3*n,1));
 else
     coeff = real(v(n+1:2*n,1).*exp(1i*v(2*n+1:3*n,1)));
 end

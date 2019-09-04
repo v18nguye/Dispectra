@@ -5,9 +5,9 @@ clc
 %%
 %load needed paths.
 addpath(genpath('./simu'))
-%addpath(genpath('/homes/v18nguye/Documents/intern2019/data/WW3'))
-%addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/blasso'))
-%addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/lasso'))
+addpath(genpath('/homes/v18nguye/Documents/intern2019/data/WW3'))
+addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/blasso'))
+addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/lasso'))
 
 addpath(genpath('E:/IMT/intern2019/data/WW3'))
 addpath(genpath('E:/IMT/intern2019/code/LB/blasso'))
@@ -77,7 +77,7 @@ opts.datom = simu_opts.datom;
 opts.B = simu_opts.p_range;
 opts.cplx = simu_opts.cplx;
 
-lambda_lambdaMax = .5;
+lambda_lambdaMax = .2;
 lambdaMax = norm(opts.A'*y,inf);
 
 opts.lambda = lambda_lambdaMax*lambdaMax;
