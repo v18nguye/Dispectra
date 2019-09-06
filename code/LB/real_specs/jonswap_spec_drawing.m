@@ -7,15 +7,15 @@ clc
 %% 
 % simulation parameters
 %
-H = 1; % significant wave height(the average height of the 1/3 highest waves).(10)
+H = 2; % significant wave height(the average height of the 1/3 highest waves).(10)
         % this parameter don't change the shape of the frequency spectrum.
         % increase the energy of the spectrum.
        
-T = 50; % the significant wave period.(14)
+T = 14; % the significant wave period.(14)
         % this parameter don't change the shape of the frequency spectrum.
         % move the spectrum towards the high frequencies.
 
-c = 20;% Mitsuyasu-type spreading function's parameter.(10)
+c = 10;% Mitsuyasu-type spreading function's parameter.(10)
 
 
 gam = 3.3;% the shape parameter of the JONSWAP frequency spectrum(3.3)
@@ -23,6 +23,7 @@ gam = 3.3;% the shape parameter of the JONSWAP frequency spectrum(3.3)
 %%
 % retrieve the spectra's information
 %
+addpath(genpath('E:/IMT/intern2019/data/WW3'))
 addpath(genpath('/homes/v18nguye/Documents/intern2019/data/WW3'))
 
 str_date = '201001';
@@ -79,7 +80,8 @@ ptp_i = IWP.ptp0(1,i2);
 betaj = 0.06238*(1.094-0.01915*log(gam))/(0.23+0.0336*gam-0.185*((1.9+gam)^-1));
 
 % spectral peak
-wp =2*pi*(1-0.132*((gam+0.2)^-0.559))/T;
+%wp =2*pi*(1-0.132*((gam+0.2)^-0.559))/T;
+wp =(1-0.132*((gam+0.2)^-0.559))/T;
 
 % the Phillips constants
 alpha = betaj*(H^2)*(wp^4); 
@@ -97,7 +99,7 @@ S_w = (alpha./(w.^5)).*exp(-1.25*((wp./w).^4)).*(gam.^phi);
 %
 
 % the mean wave direction
-theta0 = pi/2;
+theta0 = pi/3;
 theta0 = ((theta0/(pi/2)) >1)*2*pi +pi/2 -theta0;
 
 fun = @(x) (cos((((x/(pi/2))>1)*2*pi+pi/2-x- theta0)/2)).^(2*c);

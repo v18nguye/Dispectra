@@ -92,7 +92,8 @@ for i = 1:param_len
     
     betaj = 0.06238*(1.094-0.01915*log(gam))/(0.23+0.0336*gam-0.185*((1.9+gam)^-1));
     
-    wp =2*pi*(1-0.132*((gam+0.2)^-0.559))/ti;     % the peak frequency.
+    %wp =2*pi*(1-0.132*((gam+0.2)^-0.559))/ti;     % the peak frequency.
+    wp =(1-0.132*((gam+0.2)^-0.559))/ti;
     
     alpha = betaj*(hi^2)*(wp^4);   % the Phillips constants
     
@@ -161,7 +162,8 @@ for i= 1:param_len
     
     betaj = 0.06238*(1.094-0.01915*log(gam))/(0.23+0.0336*gam-0.185*((1.9+gam)^-1));
     
-    wp =2*pi*(1-0.132*((gam+0.2)^-0.559))/ti;     % the peak frequency.
+    %wp =2*pi*(1-0.132*((gam+0.2)^-0.559))/ti;     % the peak frequency.
+    wp =(1-0.132*((gam+0.2)^-0.559))/ti;
     
     dwp_T = -(1/ti)*wp; % the derivative of the wp peak frequency with respect to T (the significant wave period).
     
