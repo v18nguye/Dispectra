@@ -1,4 +1,4 @@
-function [ opts ] = jonswap_simu(dico,gam,range, freq, theta)
+function [ opts ] = jonswap_simu(dico,gam,range, ffreq, ttheta)
 
 % The code simulates the directional wave spectra modeled as follow:
 %       S(w,theta) = S(w)*G(theta)
@@ -28,19 +28,19 @@ function [ opts ] = jonswap_simu(dico,gam,range, freq, theta)
 switch dico
     case 'jonswap'
         p_range = range;
-        epsilon = 0.05;
-        min_freq = min(freq);
-        max_freq = max(freq);
-        freq_len = length(freq);
-        theta_len = length(theta);
+        %epsilon = 0.05;
+        %min_freq = min(freq);
+        %max_freq = max(freq);
+        %freq_len = length(freq);
+        %theta_len = length(theta);
         
-        freq_ = (max(epsilon,min_freq-epsilon)):(max_freq+epsilon-max(epsilon,min_freq-epsilon))/(freq_len-1):(max_freq+epsilon);
-        theta_ = 0:2*pi/(theta_len -1):2*pi;
+        %freq_ = (max(epsilon,min_freq-epsilon)):(max_freq+epsilon-max(epsilon,min_freq-epsilon))/(freq_len-1):(max_freq+epsilon);
+        %theta_ = 0:2*pi/(theta_len -1):2*pi;
         %theta_ = mod(-pi/2-theta_,2*pi);
-        theta_mask = (theta_/(pi/2)) > 1;
-        theta_ = theta_mask*2*pi + pi/2 - theta_;
-        [ffreq,ttheta] = meshgrid(freq_,theta_);
-        [fxx,fyy] = pol2cart(ttheta,ffreq);
+        %theta_mask = (theta_/(pi/2)) > 1;
+        %theta_ = theta_mask*2*pi + pi/2 - theta_;
+        %[ffreq,ttheta] = meshgrid(freq_,theta_);
+        %[fxx,fyy] = pol2cart(ttheta,ffreq);
         
         atom = @(param) atom_jonswap(param, ffreq, ttheta, gam);
         datom = @(param) datom_jonswap(param, ffreq, ttheta, gam);
@@ -51,8 +51,8 @@ switch dico
 end
 
 opts.cplx= cplx;
-opts.fx = fxx;
-opts.fy = fyy;
+%opts.fx = fxx;
+%opts.fy = fyy;
 opts.range = p_range;
 opts.atom = atom;
 opts.datom = datom;

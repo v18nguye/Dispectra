@@ -58,7 +58,7 @@ fc_lassoDual = zeros(1,opts.maxIter);
 opts_fista.lambda = opts.lambda;
 opts_fista.maxIter = 5000;
 opts_fista.tol = 1.e-6;
-opts_fista.disp = true;
+opts_fista.disp = false;
 
 
 for iter = 1 : opts.maxIter

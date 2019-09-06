@@ -59,7 +59,7 @@ opts.xinit = zeros(N,1);
 %%%%%%%%%%%%%%
 % SFW-blasso %
 %%%%%%%%%%%%%%
-opts.mergeStep = .1;
+opts.mergeStep = 0.5;
 [param_SFW_blasso, x_SFW_blasso , fc_SFW_blasso , fc_SFW_lasso , fc_SFW_lassodual ] = SFW( y , opts );
 
 

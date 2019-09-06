@@ -11,7 +11,7 @@ addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/blasso'))
 addpath(genpath('/homes/v18nguye/Documents/intern2019/code/LB/lasso'))
 
 addpath(genpath('E:/IMT/intern2019/data/WW3'))
-addpath(genpath('E:/IMT/intern2019/code/LB/bla  sso'))
+addpath(genpath('E:/IMT/intern2019/code/LB/blasso'))
 addpath(genpath('E:/IMT/intern2019/code/LB/lasso'))
 %%
 % spec file parameters
@@ -38,7 +38,7 @@ mask_p3 = ~isnan(IWP.phs3); % ....
 %% select the first spectrum with only one wave system (WS)
 
 % select date with detected wind sea, without swell
-MatTime_WS = IWP.MatTime(mask_p0 & mask_p1 & mask_p2 & ~mask_p3);
+MatTime_WS = IWP.MatTime(mask_p0 & ~mask_p1 & ~mask_p2 & ~mask_p3);
 
 % select date of first spectrum
 MatTime = MatTime_WS(1);
@@ -46,14 +46,13 @@ MatTime = MatTime_WS(1);
 % time indices in files
 b1 = SPC.MatTime;
 b2 = IWP.MatTime;
-i1 = find(abs(SPC.MatTime-MatTime) < 1e-10);
+i1 = abs(SPC.MatTime-MatTime) < 1e-10;
 i2 = find(abs(IWP.MatTime-MatTime) < 1e-10);
 
 % get spectrum
 d = SPC.direction([1:end,1]);
 freq  = SPC.frequency;
 theta = mod(-90-SPC.direction([1:end,1]),360) * pi/180;
-%theta = mod(-90-SPC.direction([1:end,1]),360) * pi/180;
 Efth = SPC.efth([1:end,1],:,i1);
 
 % convert to hte polar coordinate.
@@ -66,8 +65,8 @@ Efth = SPC.efth([1:end,1],:,i1);
 % range of each parameter.
     %   range(:,:,1) =[Hmin Tmin ; Hmax Tmax]
     %   range(:,:,2) =[cmin theta0min; cmax theta0max]
-range(:,:,1) = [0.1 10; 2 30];
-range(:,:,2) = [10 0.01*pi; 30 2*pi];
+range(:,:,1) = [0 10; 1 100];
+range(:,:,2) = [20 0; 100 2*pi];
 
 % the JONSWAP shape's parameter.
 gam = 3.3;
@@ -79,7 +78,7 @@ N = [15 15 15 18];
 y = reshape(Efth,[],1); % spec observation.
 
 % simulate.
-s = jonswap_simu('jonswap', gam, range, freq, theta);
+s = jonswap_simu('jonswap', gam, range, ffreq, ttheta);
 
 % swf method simulation parameters.
 opts.param_grid = s.test_grid(N); % create a parameter grid
@@ -94,7 +93,7 @@ opts.lambda = lambda_lambdaMax*lambdaMax;
 opts.maxIter = 100;
 opts.tol = 1.e-5;
 opts.disp = true;
-opts.mergeStep = 0.05; %0.01
+opts.mergeStep = 0.1; %0.01
 
 % resolve the system.
 tic
@@ -104,25 +103,6 @@ toc
 y1_reconstruct = opts.atom(param_SFW_blasso)*x_SFW_blasso;
 
 %%
-
-%
-% polar plot of the original occean wave spectrum
-%
-figure('Name',sprintf('Wave Spectrum for %s (%s)', pnt_name, datestr(MatTime)))
-pcolor(fx,fy,Efth)
-shading flat
-cb = colorbar;
-set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')
-
-% add detail on detected partitions
-annotation('textbox',[0.05 0.20 0.01 0.01],'FitBoxToText','on',...
-    'backgroundcolor','w',...
-    'string',{...
-    '3 systems found :', ...
-    sprintf('Hs(WS) = %4.1f m ; Dir(WS) =%3d deg',IWP.phs0(i2),IWP.pdir0(i2)), ...
-    sprintf('Hs(S1) = %4.1f m ; Dir(S1) =%3d deg',IWP.phs1(i2),IWP.pdir1(i2)), ...
-    sprintf('Hs(S2) = %4.1f m ; Dir(S2) =%3d deg',IWP.phs2(i2),IWP.pdir2(i2))})
-
 
 %
 % polar plot of four spec having the largest coefficients and a spec by suming
@@ -175,7 +155,7 @@ end
 
 % plot the sum of four specs
 figure('Name',sprintf('Spectrum recovered by the SFW method'))
-pcolor(s.fx,s.fy,reshape(real(y1_reconstruct),size(Efth)))
+pcolor(fx,fy,reshape(real(y1_reconstruct),size(Efth)))
 shading flat
 cb = colorbar;
 set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')
@@ -186,8 +166,27 @@ y2_reconstruct =0;
 for k = 1:4
     y2_reconstruct = y2_reconstruct + opts.atom(param_SFW_blasso)*v(:,k);
 end
-pcolor(s.fx,s.fy,reshape(real(y2_reconstruct),size(Efth)))
+pcolor(fx,fy,reshape(real(y2_reconstruct),size(Efth)))
 shading flat
 cb = colorbar;
 set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')
 title('By all four largest coef spec units')
+
+
+%
+% polar plot of the original occean wave spectrum
+%
+figure('Name',sprintf('Wave Spectrum for %s (%s)', pnt_name, datestr(MatTime)))
+pcolor(fx,fy,Efth)
+shading flat
+cb = colorbar;
+set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')
+
+% add detail on detected partitions
+annotation('textbox',[0.05 0.20 0.01 0.01],'FitBoxToText','on',...
+    'backgroundcolor','w',...
+    'string',{...
+    '3 systems found :', ...
+    sprintf('Hs(WS) = %4.1f m ; Dir(WS) =%3d deg',IWP.phs0(i2),IWP.pdir0(i2)), ...
+    sprintf('Hs(S1) = %4.1f m ; Dir(S1) =%3d deg',IWP.phs1(i2),IWP.pdir1(i2)), ...
+    sprintf('Hs(S2) = %4.1f m ; Dir(S2) =%3d deg',IWP.phs2(i2),IWP.pdir2(i2))})

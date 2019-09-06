@@ -300,7 +300,7 @@ while true
         coeff_temp(idx_p(1))=[];
         t_temp = norm(coeff_temp,1);
         A_temp = atom(param_temp);
-        residual = A_temp*coeff_temp-y;
+        residual = A_temp*coeff_temp-y; %%%% change here
         
         % atom selection
         fObj = @(param) min_scal_prod(residual,param,atom,datom);
