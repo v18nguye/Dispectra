@@ -7,15 +7,15 @@ clc
 %% 
 % simulation parameters
 %
-H = 2; % significant wave height(the average height of the 1/3 highest waves).(10)
+H = 1; % significant wave height(the average height of the 1/3 highest waves).(10)
         % this parameter don't change the shape of the frequency spectrum.
         % increase the energy of the spectrum.
        
-T = 14; % the significant wave period.(14)
+T = 10; % the significant wave period.(14)
         % this parameter don't change the shape of the frequency spectrum.
         % move the spectrum towards the high frequencies.
 
-c = 10;% Mitsuyasu-type spreading function's parameter.(10)
+c = 5;% Mitsuyasu-type spreading function's parameter.(10)
 
 
 gam = 3.3;% the shape parameter of the JONSWAP frequency spectrum(3.3)
