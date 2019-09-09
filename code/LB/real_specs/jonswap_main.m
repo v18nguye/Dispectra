@@ -38,7 +38,7 @@ mask_p3 = ~isnan(IWP.phs3); % ....
 %% select the first spectrum with only one wave system (WS)
 
 % select date with detected wind sea, without swell
-MatTime_WS = IWP.MatTime(~mask_p0 & mask_p1 & ~mask_p2 & ~mask_p3);
+MatTime_WS = IWP.MatTime(mask_p0 & mask_p1 & ~mask_p2 & ~mask_p3);
 
 % select date of first spectrum
 MatTime = MatTime_WS(1);
@@ -46,14 +46,14 @@ MatTime = MatTime_WS(1);
 % time indices in files
 b1 = SPC.MatTime;
 b2 = IWP.MatTime;
-i1 = abs(SPC.MatTime-MatTime) < 1e-10;
-i2 = find(abs(IWP.MatTime-MatTime) < 1e-10);
+k1 = abs(SPC.MatTime-MatTime) < 1e-10;
+k2 = find(abs(IWP.MatTime-MatTime) < 1e-10);
 
 % get spectrum
 d = SPC.direction([1:end,1]);
 freq  = SPC.frequency;
 theta = mod(-90-SPC.direction([1:end,1]),360) * pi/180;
-Efth = SPC.efth([1:end,1],:,i1);
+Efth = SPC.efth([1:end,1],:,k1);
 
 % convert to hte polar coordinate.
 [ffreq,ttheta] = meshgrid(freq,theta);
@@ -65,7 +65,7 @@ Efth = SPC.efth([1:end,1],:,i1);
 % range of each parameter.
     %   range(:,:,1) =[Hmin Tmin ; Hmax Tmax]
     %   range(:,:,2) =[cmin theta0min; cmax theta0max]
-range(:,:,1) = [0 1; 1.5 25];
+range(:,:,1) = [0 1; 1.6 25];
 range(:,:,2) = [5 0; 30 2*pi];
 
 % the JONSWAP shape's parameter.
@@ -186,7 +186,6 @@ set(get(cb,'ylabel'),'string','E(f,th) [m^2/Hz/rad]')
 annotation('textbox',[0.05 0.20 0.01 0.01],'FitBoxToText','on',...
     'backgroundcolor','w',...
     'string',{...
-    'system(s) found :', ...
-    sprintf('Hs(WS) = %4.1f m ; Dir(WS) =%3d deg',IWP.phs0(i2),IWP.pdir0(i2)), ...
-    sprintf('Hs(S1) = %4.1f m ; Dir(S1) =%3d deg',IWP.phs1(i2),IWP.pdir1(i2)), ...
-    sprintf('Hs(S2) = %4.1f m ; Dir(S2) =%3d deg',IWP.phs2(i2),IWP.pdir2(i2))})
+    '2 systems found :', ...
+    sprintf('Hs(SW) = %4.1f m ; Dir(WS) =%3d deg',IWP.phs0(k2),IWP.pdir0(k2)), ...
+    sprintf('Hs(S1) = %4.1f m ; Dir(S1) =%3d deg',IWP.phs1(k2),IWP.pdir1(k2))})

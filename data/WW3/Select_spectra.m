@@ -31,8 +31,7 @@ mask_p3 = ~isnan(IWP.phs3); % ....
 MatTime_WS = IWP.MatTime(mask_p0 & ~mask_p1 & ~mask_p2 & ~mask_p3);
 
 % select date of first spectrum
-MatTime = MatTime_WS(40);
-size(MatTime_WS)
+MatTime = MatTime_WS(1);
 
 % time indices in files
 b1 = SPC.MatTime;
