@@ -1,3 +1,3 @@
 # Sparse Waves
 
-This project contains the material about the estimation of waves fields from data by using (continuous) sparse representations
+This project contains the material about the estimation of waves fields from data by using (continuous) sparse representations. The idea motivating this project is try to figure out the principal components existing in the directional ocean wave spectra by applying the parcimonios representations method.  In the project, we address differently two cases where the spectra, modeled by a two-variate  gaussian distribution,  whose parameters take  discrete values (Lasso problem) or continuous ranges of values (Blasso problem). We tested on modeled spectra, and the real one. The results show the efficiency of the Sliding Frank-Wolfe algorithm (solve  Blasso problem) to retrieve the main components in the spectra. An extended research on the spectra modeled by JONSWAP also presented in the final report.
